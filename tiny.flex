@@ -93,13 +93,13 @@ identifier = {letter}+
    regular expression. */
    
 "if"               { return symbol(sym.IF); }
-"then"             { return symbol(sym.THEN); }
 "else"             { return symbol(sym.ELSE); }
-"end"              { return symbol(sym.END); }
-"repeat"           { return symbol(sym.REPEAT); }
-"until"            { return symbol(sym.UNTIL); }
-"read"             { return symbol(sym.READ); }
-"write"            { return symbol(sym.WRITE); }
+"int"              { return symbol(sym.INT); }
+"return"           { return symbol(sym.RETURN); }
+"void"             { return symbol(sym.VOID); }
+"while"            { return symbol(sym.WHILE); }
+
+
 ":="               { return symbol(sym.ASSIGN); }
 "="                { return symbol(sym.EQ); }
 "<"                { return symbol(sym.LT); }
