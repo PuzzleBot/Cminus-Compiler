@@ -70,9 +70,11 @@ parser code {:
    
 /* ------------Declaration of Terminals and Non Terminals Section----------- */
    
-terminal IF
-terminal 
-terminal String ID, NUM;
+terminal IF, INT, RETURN, VOID, WHILE
+terminal PLUS, MINUS, MULT, DIV, LESS_THAN,LESS_THAN_EQUAL,GREATER_THAN,GREATER_THAN_EQUAL,EQUATE, NOT_EQUAL, ASSIGN;
+terminal SEMICOLON, COMMA, LBRACKET,RBRACKET, LSQUARE_BRACKET,RSQUARE_BRACKET,LCURLY_BRACKET,RCURLY_BRACKET,
+terminal START_COMMENT, END_COMMENT
+terminal ID, NUM;
 terminal ERROR;
    
 non terminal ExpList program, stmt_seq;
