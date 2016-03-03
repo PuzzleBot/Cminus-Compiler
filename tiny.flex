@@ -118,12 +118,10 @@ identifier = {letter}+
 "]"                { return symbol(sym.RSQUARE_BRACKET); }
 "{"                { return symbol(sym.LCURLY_BRACKET); }
 "}"                { return symbol(sym.RCURLY_BRACKET); }
-"/*"               { return symbol(sym.START_COMMENT); }
-"*/"               { return symbol(sym.END_COMMENT); }
 
 
 {number}           { return symbol(sym.NUM, yytext()); }
 {identifier}       { return symbol(sym.ID, yytext()); }
 {WhiteSpace}*      { /* skip whitespace */ }   
-"{"[^\}]*"}"       { /* skip comments */ }
+"/*"[^(*/)]*"*/"   { /* skip comments */ }
 .                  { return symbol(sym.ERROR); }
