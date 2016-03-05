@@ -77,15 +77,16 @@ terminal START_COMMENT, END_COMMENT
 terminal ID, NUM;
 terminal ERROR;
    
-non terminal ExpList program, stmt_seq;
-non terminal Exp stmt, if_stmt, repeat_stmt, assign_stmt, read_stmt, write_stmt;
-non terminal Exp exp, simple_exp, term, factor;   
+non terminal program, declaration-list, declaration, var-declaration, type-specifier, fun-declaration;
+non terminal params, param-list, param, compound-stmt, local-declarations, statement-list, statement;
+non terminal expression-stmt, selection-stmt, iteration-stmt, return-stmt, expression, var, simple-expression;
+non terminal relop, additive-expression, addop, term, mulop, factor, call, args, arg-list  
 
 /* ----------------------------Grammar Section-------------------- */
    
-program	        ::= declaration-list:d1
-                {::}
-                ;
+program	::= declaration-list:d1
+        {::}
+        ;
 
 declaration-list    := declaration-list declaration | declaration
                     {::}
@@ -152,4 +153,52 @@ return-stmt := RETURN SEMICOLON | RETURN expression
             {::}
             ;
 
-expression  := var
+expression  := var ASSIGN expression | simple-expression
+            {::}
+            ;
+
+var := ID | ID LSQUARE_BRACKET expression RSQUARE_BRACKET
+    {::}
+    ;
+
+simple-expression   := additive-expression relop additive-expression
+                    |  additive-expression
+                    {::}
+                    ;
+
+relop   := LESS_THAN_EQUAL | LESS_THAN | GREATER_THAN | GREATER_THAN_EQUAL | EQUAL | NOT_EQUAL
+        {::}
+        ;
+
+additive-expression := additive-expression addop term | term
+                    {::}
+                    ;
+
+addop   := PLUS | MINUS
+        {::}
+        ;
+
+term    := term mulop factor | factor
+        {::}
+        ;
+
+mulop   := MULT | DIV
+        {::}
+        ;
+
+factor  := LBRACKET expression RBRACKET | var | call | NUM
+        {::}
+        ;
+
+call    := ID LBRACKET args RBRACKET
+        {::}
+        ;
+
+args    := arg-list | /*Empty*/
+        {::}
+        ;
+
+arg-list    := arg-list COMMA expression | expression
+            {::}
+            ;
+
