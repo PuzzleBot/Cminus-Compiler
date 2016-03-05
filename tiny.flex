@@ -107,7 +107,7 @@ identifier = {letter}+
 "<="               { return symbol(sym.LESS_THAN_EQUAL); }
 ">"                { return symbol(sym.GREATER_THAN); }
 ">="               { return symbol(sym.GREATER_THAN_EQUAL); }
-"=="               { return symbol(sym.EQUATE); }
+"=="               { return symbol(sym.EQUAL); }
 "!="               { return symbol(sym.NOT_EQUAL); }
 "="                { return symbol(sym.ASSIGN); }
 ";"                { return symbol(sym.SEMICOLON); }
