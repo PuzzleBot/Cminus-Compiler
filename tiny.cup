@@ -71,8 +71,8 @@ parser code {:
 /* ------------Declaration of Terminals and Non Terminals Section----------- */
    
 terminal IF, INT, RETURN, VOID, WHILE
-terminal PLUS, MINUS, MULT, DIV, LESS_THAN,LESS_THAN_EQUAL,GREATER_THAN,GREATER_THAN_EQUAL,EQUATE, NOT_EQUAL, ASSIGN;
-terminal SEMICOLON, COMMA, LBRACKET,RBRACKET, LSQUARE_BRACKET,RSQUARE_BRACKET,LCURLY_BRACKET,RCURLY_BRACKET,
+terminal PLUS, MINUS, MULT, DIV, LESS_THAN, LESS_THAN_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, EQUATE, NOT_EQUAL, ASSIGN;
+terminal SEMICOLON, COMMA, LBRACKET,RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRACKET, RCURLY_BRACKET;
 terminal START_COMMENT, END_COMMENT
 terminal ID, NUM;
 terminal ERROR;
@@ -83,14 +83,10 @@ non terminal Exp exp, simple_exp, term, factor;
 
 /* ----------------------------Grammar Section-------------------- */
    
-program	     ::= stmt_seq:s
-                 {: RESULT = s;
-                    System.out.println( "The abstract syntax tree is:" );
-                    Absyn.showTree( RESULT, 0 );
-                 :}
-               ;
+program	     ::= declaration-list:d1
+                 {::}
 
-stmt_seq     ::= stmt_seq:s1 SEMI stmt:s2 
+stmt_seq     ::= stmt_seq:s1 SEMI stmt:s2
                  {: ExpList t = s1;
                     while( t.tail != null )
                       t = t.tail;
