@@ -7,16 +7,16 @@ CUP=$(JAVA) $(CLASSPATH) java_cup.Main -dump -expect 3 <
 
 all: Main.class
 
-Main.class: absyn/*.java parser.java sym.java Lexer.java src/Main.java
+Main.class: absyn/*.java parser.java sym.java src/Lexer.java src/Main.java
 
 %.class: %.java
 	$(JAVAC) $(CLASSPATH)  $^
 
-Lexer.java: src/tiny.flex
+src/Lexer.java: src/tiny.flex
 	$(JFLEX) src/tiny.flex
 
 parser.java: src/tiny.cup
 	$(CUP) src/tiny.cup
 
 clean:
-	rm -f parser.java Lexer.java sym.java *.class absyn/*.class *~
+	rm -f parser.java src/Lexer.java sym.java *.class absyn/*.class *~

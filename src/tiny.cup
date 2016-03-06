@@ -70,135 +70,137 @@ parser code {:
    
 /* ------------Declaration of Terminals and Non Terminals Section----------- */
    
-terminal IF, INT, RETURN, VOID, WHILE
-terminal PLUS, MINUS, MULT, DIV, LESS_THAN, LESS_THAN_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, EQUAL, NOT_EQUAL, ASSIGN;
-terminal SEMICOLON, COMMA, LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRACKET, RCURLY_BRACKET;
-terminal START_COMMENT, END_COMMENT
-terminal ID, NUM;
+terminal String IF, INT, RETURN, VOID, WHILE, ELSE;
+terminal String PLUS, MINUS, MULT, DIV, LESS_THAN, LESS_THAN_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, EQUAL, NOT_EQUAL, ASSIGN;
+terminal String SEMICOLON, COMMA, LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRACKET, RCURLY_BRACKET;
+terminal String ID, NUM;
 terminal ERROR;
    
-non terminal program, declaration-list, declaration, var-declaration, type-specifier, fun-declaration;
-non terminal params, param-list, param, compound-stmt, local-declarations, statement-list, statement;
-non terminal expression-stmt, selection-stmt, iteration-stmt, return-stmt, expression, var, simple-expression;
-non terminal relop, additive-expression, addop, term, mulop, factor, call, args, arg-list  
+non terminal program, declaration_list, declaration, var_declaration, type_specifier, fun_declaration;
+non terminal params, param_list, param, compound_stmt, local_declarations, statement_list, statement;
+non terminal expression_stmt, selection_stmt, iteration_stmt, return_stmt, expression, var, simple_expression;
+non terminal relop, additive_expression, addop, term, mulop, factor, call, args, arg_list;
 
 /* ----------------------------Grammar Section-------------------- */
    
-program	::= declaration-list:d1
-        {::}
+program	::= declaration_list {: :}
         ;
 
-declaration-list    := declaration-list declaration {::}
-                    |  declaration {::}
+declaration_list    ::= declaration_list declaration {: :}
+                    |  declaration {: :}
                     ;
 
-declaration := var-declaration {::}
-            |  fun-declaration {::}
+declaration ::= var_declaration {: :}
+            |  fun_declaration {: :}
             ;
 
-var-declaration := type-specifier ID SEMICOLON {::}
-                | type-specifier ID LSQUARE_BRACKET NUM RSQUARE_BRACKET SEMICOLON {::}
+var_declaration ::= type_specifier ID SEMICOLON {: :}
+                | type_specifier ID LSQUARE_BRACKET NUM RSQUARE_BRACKET SEMICOLON {: :}
                 ;
 
-type-specifier  := INT | VOID
-                {::}
+type_specifier  ::= INT {: :}
+                | VOID {: :}
                 ;
 
-fun-declaration := type-specifier ID LBRACKET params RBRACKET compound-stmt
-                {::}
+fun_declaration ::= type_specifier ID LBRACKET params RBRACKET compound_stmt {: :}
                 ;
 
-params  := param-list | VOID
-        {::}
+params  ::= param_list {: :}
+        |  VOID {: :}
         ;
 
-param-list  := param-list COMMA param | param
-            {::}
+param_list  ::= param_list COMMA param {: :}
+            | param {: :}
             ;
 
-param   := type-specifier ID | type-specifier ID LSQUARE_BRACKET RSQUARE_BRACKET
-        {::}
+param   ::= type_specifier ID {: :}
+        |  type_specifier ID LSQUARE_BRACKET RSQUARE_BRACKET {: :}
         ;
 
-compound-stmt   := LCURLY_BRACKET local_declarations statement-list RCURLY_BRACKET
-                {::}
+compound_stmt   ::= LCURLY_BRACKET local_declarations statement_list RCURLY_BRACKET {: :}
                 ;
 
-local-declarations  := local-declarations var-declaration | /*Empty*/
-                    {::}
+local_declarations  ::= local_declarations var_declaration {: :}
+                    | /*Empty*/ {: :}
                     ;
 
-statement-list  := statement-list statement | /*Empty*/
-                {::}
+statement_list  ::= statement_list statement {: :}
+                | /*Empty*/ {: :}
                 ;
 
-statement   := expression-stmt | compound-stmt | selection-stmt | iteration-stmt | return-stmt
-            {::}
+statement   ::= expression_stmt {: :}
+            | compound_stmt {: :}
+            | selection_stmt {: :}
+            | iteration_stmt {: :}
+            | return_stmt {: :}
             ;
 
-expression-stmt := expression SEMICOLON | SEMICOLON
-                {::}
+expression_stmt ::= expression SEMICOLON {: :}
+                | SEMICOLON {: :}
                 ;
 
-selection-stmt  := IF LBRACKET expression RBRACKET statement
-                |  IF LBRACKET expression RBRACKET statement ELSE statement
-                {::}
+selection_stmt  ::= IF LBRACKET expression RBRACKET statement {: :}
+                |  IF LBRACKET expression RBRACKET statement ELSE statement {: :}
                 ;
 
-iteration-stmt  := while LBRACKET expression RBRACKET statement
-                {::}
+iteration_stmt  ::= WHILE LBRACKET expression RBRACKET statement {: :}
                 ;
 
-return-stmt := RETURN SEMICOLON | RETURN expression
-            {::}
+return_stmt ::= RETURN SEMICOLON {: :}
+            | RETURN expression
+            {: :}
             ;
 
-expression  := var ASSIGN expression | simple-expression
-            {::}
+expression  ::= var ASSIGN expression {: :}
+            | simple_expression {: :}
             ;
 
-var := ID | ID LSQUARE_BRACKET expression RSQUARE_BRACKET
-    {::}
+var ::= ID {: :}
+    | ID LSQUARE_BRACKET expression RSQUARE_BRACKET {: :}
     ;
 
-simple-expression   := additive-expression relop additive-expression
-                    |  additive-expression
-                    {::}
+simple_expression   ::= additive_expression relop additive_expression {: :}
+                    |  additive_expression {: :}
                     ;
 
-relop   := LESS_THAN_EQUAL | LESS_THAN | GREATER_THAN | GREATER_THAN_EQUAL | EQUAL | NOT_EQUAL
-        {::}
+relop   ::= LESS_THAN_EQUAL {: :}
+        | LESS_THAN {: :}
+        | GREATER_THAN {: :}
+        | GREATER_THAN_EQUAL {: :}
+        | EQUAL {: :}
+        | NOT_EQUAL {: :}
         ;
 
-additive-expression := additive-expression addop term | term
-                    {::}
+additive_expression ::= additive_expression addop term {: :}
+                    | term {: :}
                     ;
 
-addop   := PLUS | MINUS
-        {::}
+addop   ::= PLUS {: :}
+        | MINUS {: :}
         ;
 
-term    := term mulop factor | factor
-        {::}
+term    ::= term mulop factor {: :}
+        | factor {: :}
         ;
 
-mulop   := MULT | DIV
-        {::}
+mulop   ::= MULT {: :}
+        | DIV {: :}
         ;
 
-factor  := LBRACKET expression RBRACKET | var | call | NUM
-        {::}
+factor  ::= LBRACKET expression RBRACKET {: :}
+        | var {: :}
+        | call {: :}
+        | NUM {: :}
         ;
 
-call    := ID LBRACKET args RBRACKET
-        {::}
+call    ::= ID LBRACKET args RBRACKET {: :}
         ;
 
-args    := arg-list | /*Empty*/
-        {::}
+args    ::= arg_list {: :}
+        | /*Empty*/ {: :}
         ;
 
-arg-list    := arg-list COMMA expression | expression
-            {::}
+arg_list    ::= arg_list COMMA expression {: :}
+            | expression {: :}
             ;
 
