@@ -113,6 +113,7 @@ declaration ::= var_declaration:s1 {: :}
 
 var_declaration ::= type_specifier:s1 ID:s2 SEMICOLON {: :}
                 | type_specifier:s1 ID:s2 LSQUARE_BRACKET NUM:s3 RSQUARE_BRACKET SEMICOLON {: :}
+                | error SEMICOLON {: :}
                 ;
 
 type_specifier  ::= INT:s1 {: :}
@@ -132,6 +133,7 @@ param   ::= type_specifier:s1 ID:s2 {: :}
         ;
 
 compound_stmt   ::= LCURLY_BRACKET local_declarations:s1 statement_list:s2 RCURLY_BRACKET {: :}
+                | LCURLY_BRACKET error RCURLY_BRACKET {: :}
                 ;
 
 local_declarations  ::= local_declarations:s1 var_declaration:s2 {: :}
@@ -150,6 +152,7 @@ statement   ::= expression_stmt:s1 {: :}
             ;
 
 expression_stmt ::= expression:s1 SEMICOLON {: :}
+                | error SEMICOLON {: :}
                 | SEMICOLON {: :}
                 ;
 
@@ -161,6 +164,7 @@ iteration_stmt  ::= WHILE LBRACKET expression:s1 RBRACKET statement:s2 {: :}
                 ;
 
 return_stmt ::= RETURN SEMICOLON {: :}
+            | RETURN error SEMICOLON {: :}
             | RETURN expression:s1 {: :}
             ;
 
