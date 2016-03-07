@@ -74,7 +74,7 @@ abstract public class Absyn {
             case OpExp.TIMES:
                 System.out.println( " * " );
                 break;
-            case OpExp.OVER:
+            case OpExp.DIVIDE:
                 System.out.println( " / " );
                 break;
             case OpExp.EQ:

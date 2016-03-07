@@ -1,7 +1,7 @@
 package absyn;
 
 public class CompoundExp extends Exp{
-    varDecList decs;
+    VarDecList decs;
     ExpList exps;
     
     public CompoundExp(int pos, VarDecList decs, ExpList exps){
