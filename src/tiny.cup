@@ -100,7 +100,7 @@ precedence left ELSE;
 
 /* ----------------------------Grammar Section-------------------- */
    
-program	::= declaration_list:s1 {: :}
+program ::= declaration_list:s1 {: :}
         ;
 
 declaration_list    ::= declaration_list:s1 declaration:s2 {: :}
@@ -120,7 +120,7 @@ type_specifier  ::= INT:s1 {: :}
                 ;
 
 fun_declaration ::= type_specifier:s1 ID:s2 LBRACKET param_list:s3 RBRACKET compound_stmt:s4 {: :}
-				| VOID {: :}
+                | VOID {: :}
                 ;
 
 param_list  ::= param_list:s1 COMMA param_list:s2 {: :}
@@ -185,10 +185,10 @@ relop   ::= LESS_THAN_EQUAL {: :}
         ;
 
 /*Minimized from additive-expression*/
-arithmetic_expression 	::= arithmetic_expression:s1 addop:s2 arithmetic_expression:s3 {: :}
-						| arithmetic_expression:s1 mulop:s2 arithmetic_expression:s3 {: :}
-                      	| factor:s1 {: :}
-                    	;
+arithmetic_expression   ::= arithmetic_expression:s1 addop:s2 arithmetic_expression:s3 {: :}
+                        | arithmetic_expression:s1 mulop:s2 arithmetic_expression:s3 {: :}
+                        | factor:s1 {: :}
+                        ;
 
 addop   ::= PLUS {: :}
         | MINUS {: :}
@@ -205,7 +205,7 @@ factor  ::= LBRACKET expression:s1 RBRACKET {: :}
         ;
 
 call    ::= ID:s1 LBRACKET arg_list:s2 RBRACKET {: :}
-		| ID:s1 LBRACKET RBRACKET
+        | ID:s1 LBRACKET RBRACKET
         ;
 
 arg_list    ::= arg_list:s1 COMMA expression:s2 {: :}
