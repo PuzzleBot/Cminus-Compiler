@@ -14,6 +14,8 @@ import absyn.*;
 /* Parser code to change the way the parser reports errors (include
    line and column number of the error). */
 parser code {:
+
+    int OPERATION;
     
     /* Change the method report_error so it will display the line and
        column of where the error occurred in the input as well as the
@@ -199,12 +201,12 @@ arithmetic_expression   ::= arithmetic_expression:s1 addop:s2 arithmetic_express
                         | factor:s1 {: :}
                         ;
 
-addop   ::= PLUS {:RESULT=OpExp.PLUS; :}
-        | MINUS {:RESULT=OpExp.MINUS;  :}
+addop   ::= PLUS {:OPERATION=OpExp.PLUS; :}
+        | MINUS {:OPERATION=OpExp.MINUS;  :}
         ;
 
-mulop   ::= MULT {:RESULT=OpExp.TIMES;  :}
-        | DIV {:RESULT=OpExp.DIVIDE;  :}
+mulop   ::= MULT {:OPERATION=OpExp.MULT;  :}
+        | DIV {:OPERATION=OpExp.DIV;  :}
         ;
 
 factor  ::= LBRACKET expression:s1 RBRACKET {: :}

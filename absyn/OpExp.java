@@ -3,8 +3,8 @@ package absyn;
 public class OpExp extends Exp {
   public final static int PLUS  = 0;
   public final static int MINUS = 1;
-  public final static int TIMES = 2;
-  public final static int DIVIDE  = 3;
+  public final static int MULT = 2;
+  public final static int DIV  = 3;
   public final static int EQ    = 4;
   public final static int LT    = 5;
   public final static int LE    = 6;
