@@ -161,13 +161,8 @@ expression_stmt ::= expression:s1 SEMICOLON {: :}
                 | SEMICOLON {: :}
                 ;
 
-<<<<<<< HEAD
-selection_stmt  ::= IF LBRACKET expression:s1 RBRACKET statement:s2 ELSE statement:s3 {: :}
-                | IF LBRACKET expression:s1 RBRACKET statement:s2 {: :}
-=======
 selection_stmt  ::= IF LBRACKET expression:s1 RBRACKET statement:s2 {:RESULT = new IfExp(ileft, e, s, null);:}
                 |  IF LBRACKET expression:s1 RBRACKET statement:s2 ELSE statement:s3 {:RESULT = new IfExp(ileft, e, s, s3); :}
->>>>>>> ddde102f777d604761fc1562f61bf97141dfb472
                 ;
 
 iteration_stmt  ::= WHILE LBRACKET expression:s1 RBRACKET statement:s2 {:RESULT = new WhileExp(i.left, s1,s2); :}
