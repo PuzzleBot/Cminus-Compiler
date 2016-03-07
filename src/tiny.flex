@@ -124,4 +124,4 @@ identifier = {letter}+
 {identifier}       { return symbol(sym.ID, yytext()); }
 {WhiteSpace}*      { /* skip whitespace */ }   
 "/*"[^(*/)]*"*/"   { /* skip comments */ }
-.                  { return symbol(sym.ERROR); }
+.                  { return symbol(sym.error); }
