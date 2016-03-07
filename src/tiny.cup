@@ -172,7 +172,7 @@ expression  ::= var:s1 ASSIGN expression:s2 {: Result = new AssignExp(i.left, s1
             | simple_expression:s1 {: Result = new AssignExp(i.left, s1,s1); :}   //this condition is wrong now, fix soon
             ;
 
-var ::= ID:s1 {: :}
+var ::= ID:s1 {:RESULT = new VarExp(i.left,s1 :}
     | ID:s1 LSQUARE_BRACKET expression:s2 RSQUARE_BRACKET {: :}
     ;
 
@@ -180,12 +180,12 @@ simple_expression   ::= arithmetic_expression:s1 relop:s2 arithmetic_expression:
                     |  arithmetic_expression:s1 {: :}
                     ;
 
-relop   ::= LESS_THAN_EQUAL {:OpExp.LE :}
-        | LESS_THAN {:OpExp.LT :}
-        | GREATER_THAN {:OpExp.GT :}
-        | GREATER_THAN_EQUAL {:OpExp.GE :}
-        | EQUAL {: OpExp.Equals:}
-        | NOT_EQUAL {:OpExp.NE :}
+relop   ::= LESS_THAN_EQUAL {:RESULT=OpExp.LE :}
+        | LESS_THAN {:RESULT=OpExp.LT :}
+        | GREATER_THAN {:RESULT=OpExp.GT :}
+        | GREATER_THAN_EQUAL {:RESULT=OpExp.GE :}
+        | EQUAL {: RESULT=OpExp.Equals:}
+        | NOT_EQUAL {:RESULT=OpExp.NE :}
         ;
 
 /*Minimized from additive-expression*/
@@ -194,12 +194,12 @@ arithmetic_expression   ::= arithmetic_expression:s1 addop:s2 arithmetic_express
                         | factor:s1 {: :}
                         ;
 
-addop   ::= PLUS {: :}
-        | MINUS {: :}
+addop   ::= PLUS {:RESULT=OpExp.PLUS :}
+        | MINUS {:RESULT=OpExp.MINUS  :}
         ;
 
-mulop   ::= MULT {: :}
-        | DIV {: :}
+mulop   ::= MULT {:RESULT=OpExp.TIMES  :}
+        | DIV {:RESULT=OpExp.DIVIDE  :}
         ;
 
 factor  ::= LBRACKET expression:s1 RBRACKET {: :}
