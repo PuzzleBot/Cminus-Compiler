@@ -71,10 +71,10 @@ abstract public class Absyn {
             case OpExp.MINUS:
                 System.out.println( " - " );
                 break;
-            case OpExp.TIMES:
+            case OpExp.MULT:
                 System.out.println( " * " );
                 break;
-            case OpExp.DIVIDE:
+            case OpExp.DIV:
                 System.out.println( " / " );
                 break;
             case OpExp.EQ:

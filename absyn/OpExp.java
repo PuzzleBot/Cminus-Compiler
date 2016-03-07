@@ -19,7 +19,7 @@ public class OpExp extends Exp {
   public OpExp( int pos, Exp left, int op, Exp right ) {
     this.pos = pos;
     this.left = left;
-    this.op = op;
+    this.op = (int) op;
     this.right = right;
   }
 }

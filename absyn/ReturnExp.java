@@ -1,6 +1,6 @@
 package absyn;
 
-abstract class ReturnExp extends Exp{
+public class ReturnExp extends Exp{
     Exp exp;
     
     public ReturnExp(int pos, Exp exp){
