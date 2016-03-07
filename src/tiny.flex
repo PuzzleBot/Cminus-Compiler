@@ -120,8 +120,8 @@ identifier = {letter}+
 "}"                { System.out.print(yytext()); return symbol(sym.RCURLY_BRACKET); }
 
 
-{number}           { System.out.print(yytext()); return symbol(sym.NUM, yytext()); }
-{identifier}       { System.out.print(yytext()); return symbol(sym.ID, yytext()); }
-{WhiteSpace}+      { System.out.print(yytext()); /* skip whitespace */ }   
-"/*"[^(*/)]*"*/"   { System.out.print(yytext()); /* skip comments */ }
-.                  { System.out.print(yytext()); return symbol(sym.error); }
+{number}                                      { System.out.print(yytext()); return symbol(sym.NUM, yytext()); }
+{identifier}                                  { System.out.print(yytext()); return symbol(sym.ID, yytext()); }
+{WhiteSpace}+                                 { System.out.print(yytext()); /* skip whitespace */ }   
+"/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/"   { System.out.print(yytext()); /* skip comments */ }
+.                                             { System.out.print(yytext()); return symbol(sym.error); }
