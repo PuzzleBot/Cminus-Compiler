@@ -1,5 +1,5 @@
 package absyn;
 
-abstract class var extends absyn{
+abstract class Var extends Absyn{
     
 }

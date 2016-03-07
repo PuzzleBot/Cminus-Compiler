@@ -1,6 +1,6 @@
 package absyn;
 
-class DecList extends absyn{
+class DecList extends Absyn{
     Dec head;
     DecList tail;
     
