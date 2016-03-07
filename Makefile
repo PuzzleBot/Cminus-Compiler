@@ -14,7 +14,7 @@ Main.class: absyn/*.java bin/parser.java bin/sym.java bin/lexer.java src/Main.ja
 
 bin/lexer.java: src/tiny.flex
 	$(JFLEX) src/tiny.flex
-	mv src/lexer.java bin/lexer.java
+	mv src/Lexer.java bin/Lexer.java
 
 bin/parser.java: src/tiny.cup
 	$(CUP) src/tiny.cup
