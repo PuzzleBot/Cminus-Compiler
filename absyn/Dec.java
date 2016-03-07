@@ -1,5 +1,5 @@
 package absyn;
 
-abstract class DEC{
+abstract class Dec{
 
 }

@@ -88,7 +88,6 @@ precedence left MULT, DIV;
 
 /*Assignments before comparison*/
 precedence nonassoc LESS_THAN, LESS_THAN_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, EQUAL, NOT_EQUAL;
-precedence nonassoc ASSIGN;
 
 /*Brackets first*/
 precedence left SEMICOLON, COMMA;

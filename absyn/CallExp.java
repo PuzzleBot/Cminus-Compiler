@@ -1,6 +1,6 @@
 package absyn;
 
-public class callExp implenents Exp{
+public class callExp extends Exp{
     String func;
     EXPList args;
     

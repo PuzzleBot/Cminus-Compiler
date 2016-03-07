@@ -1,5 +1,6 @@
 package absyn;
 
-abstract class VarDeck{
-
+abstract class VarDec extends absyn{
+    
+    
 }

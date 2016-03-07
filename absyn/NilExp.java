@@ -1,5 +1,5 @@
 package absyn;
-abstract public class NilExp extends Absyn {
+abstract public class NilExp extends Exp {
 
 public NilExp (int pos){
     this.pos=pos;
