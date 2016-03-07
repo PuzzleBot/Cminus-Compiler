@@ -161,36 +161,41 @@ expression_stmt ::= expression:s1 SEMICOLON {: :}
                 | SEMICOLON {: :}
                 ;
 
+<<<<<<< HEAD
 selection_stmt  ::= IF LBRACKET expression:s1 RBRACKET statement:s2 ELSE statement:s3 {: :}
                 | IF LBRACKET expression:s1 RBRACKET statement:s2 {: :}
+=======
+selection_stmt  ::= IF LBRACKET expression:s1 RBRACKET statement:s2 {:RESULT = new IfExp(ileft, e, s, null);:}
+                |  IF LBRACKET expression:s1 RBRACKET statement:s2 ELSE statement:s3 {:RESULT = new IfExp(ileft, e, s, s3); :}
+>>>>>>> ddde102f777d604761fc1562f61bf97141dfb472
                 ;
 
-iteration_stmt  ::= WHILE LBRACKET expression:s1 RBRACKET statement:s2 {: :}
+iteration_stmt  ::= WHILE LBRACKET expression:s1 RBRACKET statement:s2 {:RESULT = new WhileExp(i.left, s1,s2); :}
                 ;
 
-return_stmt ::= RETURN SEMICOLON {: :}
-            | RETURN error SEMICOLON {: :}
-            | RETURN expression:s1 {: :}
+return_stmt ::= RETURN SEMICOLON {:RESULT=new ReturnExp(i.left,new NilExp(i.right)); :}
+            | RETURN error SEMICOLON {: System.out.println("return error"  :} //error condition
+            | RETURN expression:s1 {:RESULT=new ReturnExp(i.left,new s1); :}
             ;
 
-expression  ::= var:s1 ASSIGN expression:s2 {: :}
-            | simple_expression:s1 {: :}
+expression  ::= var:s1 ASSIGN expression:s2 {: Result = new AssignExp(i.left, s1,s2); :}
+            | simple_expression:s1 {: Result = new AssignExp(i.left, s1,s1); :}   //this condition is wrong now, fix soon
             ;
 
 var ::= ID:s1 {: :}
     | ID:s1 LSQUARE_BRACKET expression:s2 RSQUARE_BRACKET {: :}
     ;
 
-simple_expression   ::= arithmetic_expression:s1 relop:s2 arithmetic_expression:s3 {: :}
+simple_expression   ::= arithmetic_expression:s1 relop:s2 arithmetic_expression:s3 {:RESULT = new OpExp(i.left, s1,s2,s3); :}
                     |  arithmetic_expression:s1 {: :}
                     ;
 
-relop   ::= LESS_THAN_EQUAL {: :}
-        | LESS_THAN {: :}
-        | GREATER_THAN {: :}
-        | GREATER_THAN_EQUAL {: :}
-        | EQUAL {: :}
-        | NOT_EQUAL {: :}
+relop   ::= LESS_THAN_EQUAL {:OpExp.LE :}
+        | LESS_THAN {:OpExp.LT :}
+        | GREATER_THAN {:OpExp.GT :}
+        | GREATER_THAN_EQUAL {:OpExp.GE :}
+        | EQUAL {: OpExp.Equals:}
+        | NOT_EQUAL {:OpExp.NE :}
         ;
 
 /*Minimized from additive-expression*/
