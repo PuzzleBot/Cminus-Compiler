@@ -117,54 +117,66 @@ abstract public class Absyn {
     static private void showTree( VarExp tree, int spaces ) {
         indent( spaces );
         System.out.println( "VarExp: " + tree.name );
-    }
-
-    static private void showTree( WriteExp tree, int spaces ) {
-        indent( spaces );
-        System.out.println( "WriteExp:" );
-        showTree( tree.output, spaces + SPACES ); 
+          showTree( tree.variable, spaces );
     }
     
     static private void showTree( NilExp tree, int spaces ) {
         indent( spaces );
         System.out.println( "NilExp:" );
-        showTree( tree.output, spaces + SPACES ); 
     }
     
     static private void showTree( CallExp tree, int spaces ) {
         indent( spaces );
         System.out.println( "CallExp:" );
-        showTree( tree.output, spaces + SPACES ); 
+        showTree( tree.args, spaces + SPACES );
+        
     }
     
-    static private void showTree( AssignExp tree, int spaces ) {
-        indent( spaces );
-        System.out.println( "AssignExp:" );
-        showTree( tree.output, spaces + SPACES ); 
-    }
-    
-    static private void showTree( IfExp tree, int spaces ) {
-        indent( spaces );
-        System.out.println( "IfExp:" );
-        showTree( tree.output, spaces + SPACES ); 
-    }
     
     static private void showTree( WhileExp tree, int spaces ) {
         indent( spaces );
         System.out.println( "WhileExp:" );
-        showTree( tree.output, spaces + SPACES ); 
+        showTree( tree.test, spaces + SPACES ); 
+        showTree( tree.body, spaces + SPACES ); 
     }
     
     static private void showTree( ReturnExp tree, int spaces ) {
         indent( spaces );
         System.out.println( "ReturnExp:" );
-        showTree( tree.output, spaces + SPACES ); 
+        showTree( tree.exp, spaces + SPACES ); 
     }
     
     static private void showTree( CompoundExp tree, int spaces ) {
         indent( spaces );
         System.out.println( "CompoundExp:" );
-        showTree( tree.output, spaces + SPACES ); 
+        showTree( tree.decs, spaces + SPACES ); 
+        showTree( tree.exps, spaces + SPACES ); 
     }
-
+    
+    static private void showTree( VarDecList tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "VarDecList:" );
+        showTree( tree.head, spaces + SPACES ); 
+        showTree( tree.tail, spaces + SPACES ); 
+    }
+    
+    static private void showTree( SimpleDec tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "SimpleDec:" );
+        System.out.println( tree.typ+" "+tree.name );
+    }
+    
+    static private void showTree( ArrayDec tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "ArrayDec:" );
+        System.out.println( tree.typ+" "+tree.name );
+        showTree( tree.size, spaces + SPACES ); 
+    }
+    
+    static private void showTree( VarDec tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "VarDec:" );
+    }
+   
+    
 }
