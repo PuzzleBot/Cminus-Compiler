@@ -119,8 +119,7 @@ precedence left LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRA
 
 /*Else-if statements before if statements without else*/
 precedence left INT, RETURN, VOID, WHILE;
-precedence right IF;
-precedence right ELSE;
+precedence left ELSE;
 
 /* ----------------------------Grammar Section-------------------- */
    
