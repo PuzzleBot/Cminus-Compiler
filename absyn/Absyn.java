@@ -17,10 +17,11 @@ abstract public class Absyn {
     }
     
     static public void showTree( DecList tree, int spaces ) {
+        
         while( tree != null ) {
             showTree( tree.head, spaces );
             tree = tree.tail;
-        } 
+        }
     }
 
     static private void showTree( Exp tree, int spaces ) {
