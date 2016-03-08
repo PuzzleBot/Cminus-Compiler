@@ -219,8 +219,11 @@ abstract public class Absyn {
     }
    
    static private void showTree( Var tree, int spaces ) {
-        indent( spaces );
-        System.out.println( "Var:" );
+        if( tree instanceof SimpleVar )
+            showTree((SimpleVar)tree,spaces);
+        else if( tree instanceof IndexVar )
+            showTree((IndexVar)tree,spaces);
+        
     }
     
     static private void showTree( FunctionDec tree, int spaces ) {
@@ -234,7 +237,7 @@ abstract public class Absyn {
     static private void showTree( IndexVar tree, int spaces ) {
         indent( spaces );
         System.out.println( "indexed Variable: " +tree.name );
-        showTree(tree.index);
+        showTree(tree.index,spaces);
     }
     
 }
