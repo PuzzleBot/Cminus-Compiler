@@ -78,7 +78,7 @@ terminal String LESS_THAN, LESS_THAN_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, EQ
 terminal String SEMICOLON, COMMA;
 terminal String LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRACKET, RCURLY_BRACKET;
 terminal String ID; 
-terminal IntExp NUM;
+terminal int NUM;
 
 non terminal Absyn program;
 non terminal DecList declaration_list;
@@ -87,7 +87,7 @@ non terminal VarDec var_declaration;
 non terminal FunctionDec fun_declaration;
 
 non terminal VarDecList param_list, local_declarations;
-non terminal SimpleDec param;
+non terminal VarDec param;
 non terminal CompoundExp compound_stmt;
 
 non terminal IfExp selection_stmt; 
@@ -132,7 +132,7 @@ program ::= declaration_list:s1
         ;
 
 declaration_list    ::= declaration:s1 declaration_list:s2 {: RESULT = new DecList(s1, s2); :}
-                    |  declaration:s1 {: RESULT = s1; :}
+                    |  declaration:s1 {:  :}
                     ;
 
 declaration ::= var_declaration:s1 {: RESULT = s1; :}
@@ -140,7 +140,7 @@ declaration ::= var_declaration:s1 {: RESULT = s1; :}
             ;
 
 var_declaration ::= type_specifier:s1 ID:s2 SEMICOLON {: RESULT = new SimpleDec(s1left, s1, s2); :}
-                | type_specifier:s1 ID:s2 LSQUARE_BRACKET NUM:s3 RSQUARE_BRACKET SEMICOLON {: RESULT = new ArrayDec(s1left, s1, s2, s3); :}
+                | type_specifier:s1 ID:s2 LSQUARE_BRACKET NUM:s3 RSQUARE_BRACKET SEMICOLON {: RESULT = new ArrayDec(s1left, s1, s2, new IntExp(s3left, s3)); :}
                 | error:i SEMICOLON {: System.out.println("Error starting on line " + ileft + ": invalid statement"); :}
                 ;
 
@@ -155,6 +155,7 @@ s3); :}
                 ;
 
 param_list  ::= param:s1 COMMA param_list:s2 {: RESULT = new VarDecList(s1, s2); :}
+            | /*Empty*/ {: :}
             ;
 
 param   ::= type_specifier:s1 ID:s2 {: RESULT = new SimpleDec(s1left, s1, s2); :}
@@ -209,12 +210,12 @@ simple_expression   ::= arithmetic_expression:s1 relop:s2 arithmetic_expression:
                     |  arithmetic_expression:s1 {: RESULT = s1; :}
                     ;
 
-relop   ::= LESS_THAN_EQUAL {:RESULT=OpExp.LE; :}
-        | LESS_THAN {:RESULT=OpExp.LT; :}
-        | GREATER_THAN {:RESULT=OpExp.GT; :}
-        | GREATER_THAN_EQUAL {:RESULT=OpExp.GE; :}
-        | EQUAL {: RESULT=OpExp.EQ;:}
-        | NOT_EQUAL {:RESULT=OpExp.NE; :}
+relop   ::= LESS_THAN_EQUAL {:RESULT=6/*OpExp.LE*/; :}
+        | LESS_THAN {:RESULT=5/*OpExp.LT*/; :}
+        | GREATER_THAN {:RESULT=7/*OpExp.GT*/; :}
+        | GREATER_THAN_EQUAL {:RESULT=8/*OpExp.GE*/; :}
+        | EQUAL {: RESULT=4/*OpExp.EQ*/;:}
+        | NOT_EQUAL {:RESULT=9/*OpExp.NE*/; :}
         ;
 
 /*Minimized from additive-expression*/
@@ -223,12 +224,12 @@ arithmetic_expression   ::= arithmetic_expression:s1 addop:s2 arithmetic_express
                         | factor:s1 {: :}
                         ;
 
-addop   ::= PLUS {:RESULT=new Integer(OpExp.PLUS); :}
-        | MINUS {:RESULT=new Integer(OpExp.MINUS); :}
+addop   ::= PLUS {:RESULT=0/*OpExp.PLUS*/; :}
+        | MINUS {:RESULT=1/*OpExp.MINUS*/; :}
         ;
 
-mulop   ::= MULT {:RESULT=new Integer(OpExp.MULT);  :}
-        | DIV {:RESULT=new Integer(OpExp.DIV);  :}
+mulop   ::= MULT {:RESULT=2/*OpExp.MULT*/;  :}
+        | DIV {:RESULT=3/*OpExp.DIV*/;  :}
         ;
 
 factor  ::= LBRACKET expression:s1 RBRACKET {: RESULT = s1; :}

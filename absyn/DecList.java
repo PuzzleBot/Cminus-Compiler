@@ -5,7 +5,7 @@ public class DecList extends Absyn{
     public DecList tail;
     
     public DecList(Dec head,DecList tail){
-    this.head=head;
-    this.tail=tail;
+        this.head=head;
+        this.tail=tail;
     }
 }
