@@ -1,6 +1,6 @@
 package absyn;
 
-public abstract class VarDec extends Absyn{
+public abstract class VarDec extends Dec{
     
     
 }
