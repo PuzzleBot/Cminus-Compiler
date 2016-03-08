@@ -131,7 +131,7 @@ program ::= declaration_list:s1
         ;
 
 declaration_list    ::= declaration:s1 declaration_list:s2 {: RESULT = new DecList(s1, s2); :}
-                    |  /*Empty*/
+                    |  /*empty*/
                     | error declaration_list:s1 {: parser.report_fatal_error("Invalid declaration.", null); :}
                     ;
 
@@ -156,7 +156,7 @@ s3); :}
                 ;
 
 param_list  ::= param:s1 COMMA param_list:s2 {: RESULT = new VarDecList(s1, s2); :}
-            | /*Empty*/ {: :}
+            | /*empty*/ {: :}
             ;
 
 param   ::= type_specifier:s1 ID:s2 {: RESULT = new SimpleDec(s1left, s1, s2); :}
@@ -168,11 +168,11 @@ compound_stmt   ::= LCURLY_BRACKET:i local_declarations:s1 statement_list:s2 RCU
                 ;
 
 local_declarations  ::= var_declaration:s1 local_declarations:s2 {: RESULT = new VarDecList(s1, s2); :}
-                    | /*Empty*/ {: :}
+                    | /*empty*/ {: :}
                     ;
 
 statement_list  ::= statement:s1 statement_list:s2 {: RESULT = new ExpList(s1, s2);:}
-                | /*Empty*/ {: :}
+                | /*empty*/ {: :}
                 ;
 
 statement   ::= expression_stmt:s1 {: RESULT = s1; :}
@@ -187,8 +187,8 @@ expression_stmt ::= expression:s1 SEMICOLON {: RESULT = s1; :}
                 | SEMICOLON {: :}
                 ;
 
-selection_stmt  ::= IF:i LBRACKET expression:s1 RBRACKET statement:s2 {:RESULT = new IfExp(ileft, s1, s2, null);:}
-                |  IF:i LBRACKET expression:s1 RBRACKET statement:s2 ELSE statement:s3 {:RESULT = new IfExp(ileft, s1, s2, s3); :}
+selection_stmt  ::= IF:i LBRACKET expression:s1 RBRACKET statement:s2 ELSE statement:s3 {:RESULT = new IfExp(ileft, s1, s2, s3); :}
+                |  IF:i LBRACKET expression:s1 RBRACKET statement:s2 {:RESULT = new IfExp(ileft, s1, s2, null);:}
                 ;
 
 iteration_stmt  ::= WHILE:i LBRACKET expression:s1 RBRACKET statement:s2 {:RESULT = new WhileExp(ileft, s1, s2); :}
@@ -246,6 +246,6 @@ call    ::= ID:s1 LBRACKET arg_list:s2 RBRACKET {: RESULT = new CallExp(s1left, 
         ;
 
 arg_list    ::= expression:s1 COMMA arg_list:s2 {: RESULT = new ExpList(s1, s2); :}
-            | /*Empty*/ {: :}
+            | /*empty*/ {: :}
             ;
 
