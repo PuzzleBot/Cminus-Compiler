@@ -96,7 +96,7 @@ non terminal ReturnExp return_stmt;
 non terminal Var var;
 
 non terminal OpExp arithmetic_expression, simple_expression;
-non terminal int addop, mulop, relop;
+non terminal Integer addop, mulop, relop;
 non terminal NameTy type_specifier;
 non terminal Exp expression, factor, statement, expression_stmt;
 non terminal CallExp call;
