@@ -3,9 +3,10 @@ A JFlex+Cup implementation for the C-Minus language.
   To build the entire program, type "make" in the current directory, which will 
 generate an executable program called "main".
 
-  To test source code like "euclid.cm", type 
+To test source code like "euclid.cm", type 
 
     "java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ Main test/euclid.cm"
+
 
 and the syntax tree will be displayed on the screen.
 
