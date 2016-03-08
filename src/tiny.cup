@@ -105,6 +105,7 @@ non terminal ExpList arg_list, statement_list;
 
 /*If no other rules are satisfied, it is an error*/
 precedence left error;
+precedence left ID, NUM;
 
 /*Multiply before adding*/
 precedence left PLUS, MINUS;
@@ -172,7 +173,7 @@ local_declarations  ::= var_declaration:s1 local_declarations:s2 {: RESULT = new
                     ;
 
 statement_list  ::= statement:s1 statement_list:s2 {: RESULT = new ExpList(s1, s2);:}
-                | /*empty*/ {: :}
+                | statement:s1 {: RESULT = new ExpList(s1, null); :}
                 ;
 
 statement   ::= expression_stmt:s1 {: RESULT = s1; :}
