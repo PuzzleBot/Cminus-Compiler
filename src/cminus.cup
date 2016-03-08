@@ -133,18 +133,19 @@ declaration ::= var_declaration:s1 {: RESULT = s1; :}
             ;
 
 fun_declaration ::= type_specifier:s1 ID:s2 LBRACKET param_list:s3 RBRACKET compound_stmt:s4 
-                {: RESULT = new FunctionDec(s1left, s1, s2, s3, s4); /*System.out.println(RESULT);*/:}
+                {: RESULT = new FunctionDec(s1left, s1, s2, s3, s4); :}
 
                 | type_specifier:s1 ID:s2 LBRACKET VOID RBRACKET compound_stmt:s3 
-                {: RESULT = new FunctionDec(s1left, s1, s2, null, s3); /*System.out.println(RESULT);*/:}
+                {: RESULT = new FunctionDec(s1left, s1, s2, null, s3); :}
 
                 | type_specifier:s1 ID:s2 LBRACKET error RBRACKET compound_stmt:s3 
-                {: parser.report_error("Error starting on line " + s1left + ": invalid parameters", null); /*System.out.println(RESULT);*/ :}
+                {: parser.report_error("Error starting on line " + s1left + ": invalid parameters", null);  :}
                 ;
 
-var_declaration ::= type_specifier:s1 ID:s2 SEMICOLON {: RESULT = new SimpleDec(s1left, s1, s2); /*System.out.println(RESULT);*/:}
+var_declaration ::= type_specifier:s1 ID:s2 SEMICOLON {: RESULT = new SimpleDec(s1left, s1, s2); :}
                 | type_specifier:s1 ID:s2 LSQUARE_BRACKET NUM:s3 RSQUARE_BRACKET SEMICOLON 
-                {: RESULT = new ArrayDec(s1left, s1, s2, new IntExp(s3left, s3)); /*System.out.println(RESULT);*/:}
+                {: RESULT = new ArrayDec(s1left, s1, s2, new IntExp(s3left, s3)); :}
+                | error:i SEMICOLON {: parser.report_fatal_error("Fatal error on line " + ileft + ": invalid declaration.", null); :}
                 ;
 
 type_specifier  ::= INT:s1 {: RESULT = new NameTy(s1left, NameTy.INT); :}
@@ -160,8 +161,8 @@ param   ::= type_specifier:s1 ID:s2 {: RESULT = new SimpleDec(s1left, s1, s2); :
         |  type_specifier:s1 ID:s2 LSQUARE_BRACKET RSQUARE_BRACKET {: new SimpleDec(s1left, s1, s2); :}
         ;
 
-compound_stmt   ::= LCURLY_BRACKET:i local_declarations:s1 statement_list:s2 RCURLY_BRACKET {: RESULT = new CompoundExp(ileft, s1, s2); /*System.out.println(RESULT);*/:}
-                | LCURLY_BRACKET:i error RCURLY_BRACKET {: parser.report_error("Error on line " + ileft + ": invalid statement", null); /*System.out.println(RESULT);*/:}
+compound_stmt   ::= LCURLY_BRACKET:i local_declarations:s1 statement_list:s2 RCURLY_BRACKET {: RESULT = new CompoundExp(ileft, s1, s2); :}
+                | LCURLY_BRACKET:i error RCURLY_BRACKET {: parser.report_error("Error on line " + ileft + ": invalid block", null); :}
                 ;
 
 local_declarations  ::= var_declaration:s1 local_declarations:s2 {: RESULT = new VarDecList(s1, s2); :}
@@ -172,11 +173,11 @@ statement_list  ::= statement:s1 statement_list:s2 {: RESULT = new ExpList(s1, s
                 | /*Empty*/ {: RESULT = new ExpList(null, null); :}
                 ;
 
-statement   ::= expression_stmt:s1 {: RESULT = s1; /*System.out.println(RESULT);*/:}
-            | compound_stmt:s1 {: RESULT = s1; /*System.out.println(RESULT);*/:}
-            | selection_stmt:s1 {: RESULT = s1; /*System.out.println(RESULT);*/:}
-            | iteration_stmt:s1 {: RESULT = s1; /*System.out.println(RESULT);*/:}
-            | return_stmt:s1 {: RESULT = s1; /*System.out.println(RESULT);*/:}
+statement   ::= expression_stmt:s1 {: RESULT = s1; :}
+            | compound_stmt:s1 {: RESULT = s1; :}
+            | selection_stmt:s1 {: RESULT = s1; :}
+            | iteration_stmt:s1 {: RESULT = s1; :}
+            | return_stmt:s1 {: RESULT = s1; :}
             ;
 
 expression_stmt ::= expression:s1 SEMICOLON {: RESULT = s1; :}
@@ -195,11 +196,12 @@ iteration_stmt  ::= WHILE:i LBRACKET expression:s1 RBRACKET statement:s2 {:RESUL
 
 return_stmt ::= RETURN:i SEMICOLON {:RESULT=new ReturnExp(ileft, new NilExp(ileft)); :}
             | RETURN:i expression:s1 SEMICOLON {: RESULT = new ReturnExp(ileft, s1); :}
-            | RETURN:i error SEMICOLON {: parser.report_error("Error on line " + ileft + ": invalid return", null);  :} 
+            | RETURN:i error SEMICOLON 
+            {: parser.report_error("Error on line " + ileft + ": invalid return", null); RESULT = new ReturnExp(ileft, new NilExp(ileft)); :} 
             ;
 
-expression  ::= var:s1 ASSIGN expression:s2 {: RESULT = new AssignExp(s1left, s1, s2); /*System.out.println(RESULT);*/:}
-            | simple_expression:s1 {: RESULT = s1; /*System.out.println(RESULT);*/:} 
+expression  ::= var:s1 ASSIGN expression:s2 {: RESULT = new AssignExp(s1left, s1, s2); :}
+            | simple_expression:s1 {: RESULT = s1; :} 
             ;
 
 var ::= ID:s1 {:RESULT = new SimpleVar(s1left, s1); :}
