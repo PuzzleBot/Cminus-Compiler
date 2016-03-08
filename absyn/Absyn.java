@@ -46,8 +46,6 @@ abstract public class Absyn {
                 showTree( (NilExp)tree, spaces );
             else if( tree instanceof CallExp ) 
                 showTree( (CallExp)tree, spaces );
-            else if( tree instanceof AssignExp ) 
-                showTree( (AssignExp)tree, spaces );
             else if( tree instanceof WhileExp ) 
                 showTree( (WhileExp)tree, spaces );
             else if( tree instanceof ReturnExp ) 
@@ -78,7 +76,9 @@ abstract public class Absyn {
         spaces += SPACES;
         showTree( tree.test, spaces );
         showTree( tree.thenpart, spaces );
-        showTree( tree.elsepart, spaces );
+        if(tree.elsepart!=null){
+            showTree( tree.elsepart, spaces );
+        }
     }
 
     static private void showTree( IntExp tree, int spaces ) {
@@ -164,7 +164,7 @@ abstract public class Absyn {
     
     static private void showTree( CallExp tree, int spaces ) {
         indent( spaces );
-        System.out.println( "CallExp:" );
+        System.out.println( "CallExp: " +tree.func );
         showTree( tree.args, spaces + SPACES );
         
     }
@@ -226,6 +226,15 @@ abstract public class Absyn {
     static private void showTree( FunctionDec tree, int spaces ) {
         indent( spaces );
         System.out.println( "FunctionDec:" );
+    }
+    static private void showTree( SimpleVar tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "Variable: " +tree.name );
+    }
+    static private void showTree( IndexVar tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "indexed Variable: " +tree.name );
+        showTree(tree.index);
     }
     
 }
