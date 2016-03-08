@@ -92,37 +92,37 @@ identifier = {letter}+
    code, that will be executed when the scanner matches the associated
    regular expression. */
 
-\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/   { System.out.print(yytext()); /* skip comments */ }
+\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/   {  /* skip comments */ }
    
-"if"               { System.out.print(yytext()); return symbol(sym.IF); }
-"else"             { System.out.print(yytext()); return symbol(sym.ELSE); }
-"int"              { System.out.print(yytext()); return symbol(sym.INT); }
-"return"           { System.out.print(yytext()); return symbol(sym.RETURN); }
-"void"             { System.out.print(yytext()); return symbol(sym.VOID); }
-"while"            { System.out.print(yytext()); return symbol(sym.WHILE); }
+"if"               {  return symbol(sym.IF); }
+"else"             {  return symbol(sym.ELSE); }
+"int"              {  return symbol(sym.INT); }
+"return"           {  return symbol(sym.RETURN); }
+"void"             {  return symbol(sym.VOID); }
+"while"            {  return symbol(sym.WHILE); }
 
-"+"                { System.out.print(yytext()); return symbol(sym.PLUS); }
-"-"                { System.out.print(yytext()); return symbol(sym.MINUS); }
-"*"                { System.out.print(yytext()); return symbol(sym.MULT); }
-"/"                { System.out.print(yytext()); return symbol(sym.DIV); }
-"<"                { System.out.print(yytext()); return symbol(sym.LESS_THAN); }
-"<="               { System.out.print(yytext()); return symbol(sym.LESS_THAN_EQUAL); }
-">"                { System.out.print(yytext()); return symbol(sym.GREATER_THAN); }
-">="               { System.out.print(yytext()); return symbol(sym.GREATER_THAN_EQUAL); }
-"=="               { System.out.print(yytext()); return symbol(sym.EQUAL); }
-"!="               { System.out.print(yytext()); return symbol(sym.NOT_EQUAL); }
-"="                { System.out.print(yytext()); return symbol(sym.ASSIGN); }
-";"                { System.out.print(yytext()); return symbol(sym.SEMICOLON); }
-","                { System.out.print(yytext()); return symbol(sym.COMMA); }
-"("                { System.out.print(yytext()); return symbol(sym.LBRACKET); }
-")"                { System.out.print(yytext()); return symbol(sym.RBRACKET); }
-"["                { System.out.print(yytext()); return symbol(sym.LSQUARE_BRACKET); }
-"]"                { System.out.print(yytext()); return symbol(sym.RSQUARE_BRACKET); }
-"{"                { System.out.print(yytext()); return symbol(sym.LCURLY_BRACKET); }
-"}"                { System.out.print(yytext()); return symbol(sym.RCURLY_BRACKET); }
+"+"                {  return symbol(sym.PLUS); }
+"-"                {  return symbol(sym.MINUS); }
+"*"                {  return symbol(sym.MULT); }
+"/"                {  return symbol(sym.DIV); }
+"<"                {  return symbol(sym.LESS_THAN); }
+"<="               {  return symbol(sym.LESS_THAN_EQUAL); }
+">"                {  return symbol(sym.GREATER_THAN); }
+">="               {  return symbol(sym.GREATER_THAN_EQUAL); }
+"=="               {  return symbol(sym.EQUAL); }
+"!="               {  return symbol(sym.NOT_EQUAL); }
+"="                {  return symbol(sym.ASSIGN); }
+";"                {  return symbol(sym.SEMICOLON); }
+","                {  return symbol(sym.COMMA); }
+"("                {  return symbol(sym.LBRACKET); }
+")"                {  return symbol(sym.RBRACKET); }
+"["                {  return symbol(sym.LSQUARE_BRACKET); }
+"]"                {  return symbol(sym.RSQUARE_BRACKET); }
+"{"                {  return symbol(sym.LCURLY_BRACKET); }
+"}"                {  return symbol(sym.RCURLY_BRACKET); }
 
 
-{number}                                      { System.out.print(yytext()); return symbol(sym.NUM, Integer.parseInt(yytext())); }
-{identifier}                                  { System.out.print(yytext()); return symbol(sym.ID, yytext()); }
-{WhiteSpace}+                                 { System.out.print(yytext()); /* skip whitespace */ }   
-.                                             { System.out.print(yytext()); return symbol(sym.error); }
+{number}                                      {  return symbol(sym.NUM, Integer.parseInt(yytext())); }
+{identifier}                                  {  return symbol(sym.ID, yytext()); }
+{WhiteSpace}+                                 {  /* skip whitespace */ }   
+.                                             {  return symbol(sym.error); }

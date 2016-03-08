@@ -17,3 +17,7 @@ the directory "absyn" and within "Absyn.java" class, the showTree function
 is implemented.  In addition, since some java files are generated automatically,
 they may contain variables that are not used, which are safe to ignore in
 the compilation process.
+
+Error recovery notes:
+- The parser will recover from invalid expressions that are not missing right brackets.
+- However, invalid variable declarations cannot be recovered from and cause error reports instead

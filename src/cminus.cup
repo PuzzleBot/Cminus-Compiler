@@ -145,6 +145,8 @@ fun_declaration ::= type_specifier:s1 ID:s2 LBRACKET param_list:s3 RBRACKET comp
 var_declaration ::= type_specifier:s1 ID:s2 SEMICOLON {: RESULT = new SimpleDec(s1left, s1, s2); :}
                 | type_specifier:s1 ID:s2 LSQUARE_BRACKET NUM:s3 RSQUARE_BRACKET SEMICOLON 
                 {: RESULT = new ArrayDec(s1left, s1, s2, new IntExp(s3left, s3)); :}
+                | type_specifier:s1 ID:s2 LSQUARE_BRACKET error RSQUARE_BRACKET SEMICOLON
+                {: parser.report_fatal_error("Fatal error on line " + s1left + ": invalid array length.", null); :}
                 | error:i SEMICOLON {: parser.report_fatal_error("Fatal error on line " + ileft + ": invalid declaration.", null); :}
                 ;
 
@@ -181,7 +183,8 @@ statement   ::= expression_stmt:s1 {: RESULT = s1; :}
             ;
 
 expression_stmt ::= expression:s1 SEMICOLON {: RESULT = s1; :}
-                | error:i SEMICOLON {: parser.report_error("Error on line " + ileft + ": invalid expression", null); :}
+                | error:i SEMICOLON 
+                {: parser.report_error("Error on line " + ileft + ": invalid expression", null); RESULT = new NilExp(ileft); :}
                 ;
 
 selection_stmt  ::= selection_else_stmt:s1 {:RESULT = s1;:}

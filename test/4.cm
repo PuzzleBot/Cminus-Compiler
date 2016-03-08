@@ -1,11 +1,11 @@
 /* A program that uses Euclid’s algorithm to 
-compute gcd (invalid function declaration: bad parameters - 2 errors)*/
+compute gcd (invalid function declaration: bad parameters, bad return - 3 errors)*/
 
 int gcd (int u, int v; int 5 ) {
     if (v == 0) 
         return u;
     else
-        return gcd(v, u - u / v * v);  /* u-u/v*v == u mod v */
+        return gcd(v, u ; - u / v * v);  /* u-u/v*v == u mod v */
 }
 
 void main (void) {
