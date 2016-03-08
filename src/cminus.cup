@@ -126,14 +126,20 @@ precedence left LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRA
 /* ----------------------------Grammar Section-------------------- */
    
 program ::= declaration_list:s1 
-        {:  RESULT = s1;
-            System.out.println( "The abstract syntax tree is:" );
+        {:  System.out.println( "The abstract syntax tree is:" );
             Absyn.showTree( RESULT, 0 );
         :}
         ;
 
-declaration_list    ::= declaration:s1 declaration_list:s2 {: RESULT = new DecList(s1, s2); :}
-                    |  /*empty*/
+declaration_list    ::= declaration:s1 declaration_list:s2
+         {: DecList t = s2;
+                    while( t.tail != null )
+                      t = t.tail;
+                    t.tail = new DecList(s1, null);
+                    
+                    RESULT = s2;
+        :}
+                    |  declaration:s1 {: RESULT=new DecList(s1,null); :}
                     | error declaration_list:s1 {: parser.report_fatal_error("Invalid declaration.", null); :}
                     ;
 
@@ -141,10 +147,8 @@ declaration ::= var_declaration:s1 {: RESULT = s1; :}
             |  fun_declaration:s1 {: RESULT = s1; :}
             ;
 
-fun_declaration ::= type_specifier:s1 ID:s2 LBRACKET param_list:s3 RBRACKET compound_stmt:s4 {: RESULT = new FunctionDec(s1left, s1, s2, s3, 
-s4); :}
-                | type_specifier:s1 ID:s2 LBRACKET VOID RBRACKET compound_stmt:s3 {: RESULT = new FunctionDec(s1left, s1, s2, null, 
-s3); :}
+fun_declaration ::= type_specifier:s1 ID:s2 LBRACKET param_list:s3 RBRACKET compound_stmt:s4 {: RESULT = new FunctionDec(s1left, s1, s2, s3, s4); :}
+                | type_specifier:s1 ID:s2 LBRACKET VOID RBRACKET compound_stmt:s3 {: RESULT = new FunctionDec(s1left, s1, s2, null, s3); :}
                 | type_specifier:s1 ID:s2 LBRACKET error RBRACKET compound_stmt:s3 {: parser.report_error("Error starting on line " + s1left + ": invalid parameters", null);  :}
                 ;
 

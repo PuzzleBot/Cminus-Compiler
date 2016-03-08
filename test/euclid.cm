@@ -1,7 +1,7 @@
 /* A program that uses Euclid’s algorithm to 
 compute gcd */
 
-int stuff (int de, int du){
+int stuff (int de){
 	return de;
 }
 
@@ -9,7 +9,7 @@ void notFun(void){
 	return;
 }
 
-int gcd (int u, int v ) {
+int gcd ( int v ) {
     if (v == 0) 
         return u;
     /*else
