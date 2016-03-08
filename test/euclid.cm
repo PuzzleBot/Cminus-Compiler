@@ -1,6 +1,10 @@
 /* A program that uses Euclid’s algorithm to 
 compute gcd */
 
+int stuff (int de, int du){
+	return de;
+}
+
 int gcd (int u, int v ) {
     if (v == 0) 
         return u;

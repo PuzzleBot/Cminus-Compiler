@@ -90,7 +90,7 @@ non terminal VarDecList param_list, local_declarations;
 non terminal VarDec param;
 non terminal CompoundExp compound_stmt;
 
-non terminal IfExp selection_stmt; 
+non terminal IfExp selection_stmt, selection_else_stmt, selection_noelse_stmt; 
 non terminal WhileExp iteration_stmt; 
 non terminal ReturnExp return_stmt; 
 non terminal Var var;
@@ -110,16 +110,17 @@ precedence left error;
 precedence left PLUS, MINUS;
 precedence left MULT, DIV;
 
-/*Assignments before comparison*/
 precedence nonassoc LESS_THAN, LESS_THAN_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, EQUAL, NOT_EQUAL;
+precedence left ASSIGN;
 
-/*Brackets first*/
-precedence left SEMICOLON, COMMA;
-precedence left LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRACKET, RCURLY_BRACKET;
+precedence left SEMICOLON;
 
 /*Else-if statements before if statements without else*/
 precedence left INT, RETURN, VOID, WHILE;
 precedence left ELSE;
+
+precedence left COMMA;
+precedence left LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRACKET, RCURLY_BRACKET;
 
 /* ----------------------------Grammar Section-------------------- */
    
@@ -139,15 +140,6 @@ declaration ::= var_declaration:s1 {: RESULT = s1; :}
             |  fun_declaration:s1 {: RESULT = s1; :}
             ;
 
-var_declaration ::= type_specifier:s1 ID:s2 SEMICOLON {: RESULT = new SimpleDec(s1left, s1, s2); :}
-                | type_specifier:s1 ID:s2 LSQUARE_BRACKET NUM:s3 RSQUARE_BRACKET SEMICOLON {: RESULT = new ArrayDec(s1left, s1, s2, new IntExp(s3left, s3)); :}
-                | error:i SEMICOLON {: parser.report_error("Error starting on line " + ileft + ": invalid statement", null); :}
-                ;
-
-type_specifier  ::= INT:s1 {: RESULT = new NameTy(s1left, NameTy.INT); :}
-                | VOID:s1 {: RESULT = new NameTy(s1left, NameTy.VOID); :}
-                ;
-
 fun_declaration ::= type_specifier:s1 ID:s2 LBRACKET param_list:s3 RBRACKET compound_stmt:s4 {: RESULT = new FunctionDec(s1left, s1, s2, s3, 
 s4); :}
                 | type_specifier:s1 ID:s2 LBRACKET VOID RBRACKET compound_stmt:s3 {: RESULT = new FunctionDec(s1left, s1, s2, null, 
@@ -155,8 +147,16 @@ s3); :}
                 | type_specifier:s1 ID:s2 LBRACKET error RBRACKET compound_stmt:s3 {: parser.report_error("Error starting on line " + s1left + ": invalid parameters", null);  :}
                 ;
 
+var_declaration ::= type_specifier:s1 ID:s2 SEMICOLON {: RESULT = new SimpleDec(s1left, s1, s2); :}
+                | type_specifier:s1 ID:s2 LSQUARE_BRACKET NUM:s3 RSQUARE_BRACKET SEMICOLON {: RESULT = new ArrayDec(s1left, s1, s2, new IntExp(s3left, s3)); :}
+                ;
+
+type_specifier  ::= INT:s1 {: RESULT = new NameTy(s1left, NameTy.INT); :}
+                | VOID:s1 {: RESULT = new NameTy(s1left, NameTy.VOID); :}
+                ;
+
 param_list  ::= param:s1 COMMA param_list:s2 {: RESULT = new VarDecList(s1, s2); :}
-            | /*empty*/ {: :}
+            | param:s1 {: RESULT = new VarDecList(s1, null); :}
             ;
 
 param   ::= type_specifier:s1 ID:s2 {: RESULT = new SimpleDec(s1left, s1, s2); :}
@@ -187,9 +187,12 @@ expression_stmt ::= expression:s1 SEMICOLON {: RESULT = s1; :}
                 | SEMICOLON {: :}
                 ;
 
-selection_stmt  ::= IF:i LBRACKET expression:s1 RBRACKET statement:s2 ELSE statement:s3 {:RESULT = new IfExp(ileft, s1, s2, s3); :}
-                |  IF:i LBRACKET expression:s1 RBRACKET statement:s2 {:RESULT = new IfExp(ileft, s1, s2, null);:}
+selection_stmt  ::= selection_else_stmt:s1 {:RESULT = s1;:}
+                |   selection_noelse_stmt:s1 {:RESULT = s1;:}
                 ;
+
+selection_else_stmt ::= IF:i LBRACKET expression:s1 RBRACKET statement:s2 ELSE statement:s3 {:RESULT = new IfExp(ileft, s1, s2, s3); :} ;
+selection_noelse_stmt   ::= IF:i LBRACKET expression:s1 RBRACKET statement:s2 {:RESULT = new IfExp(ileft, s1, s2, null);:} ;
 
 iteration_stmt  ::= WHILE:i LBRACKET expression:s1 RBRACKET statement:s2 {:RESULT = new WhileExp(ileft, s1, s2); :}
                 ;
@@ -242,10 +245,10 @@ factor  ::= LBRACKET expression:s1 RBRACKET {: RESULT = s1; :}
 
 call    ::= ID:s1 LBRACKET arg_list:s2 RBRACKET {: RESULT = new CallExp(s1left, s1, s2); :}
         | ID:s1 LBRACKET RBRACKET {: RESULT = new CallExp(s1left, s1, null); :}
-        | ID:s1 LBRACKET error RBRACKET {: parser.report_error("Error on line " + s1left + ": invalid call parameters", null); :}
+        /*| ID:s1 LBRACKET error RBRACKET {: parser.report_error("Error on line " + s1left + ": invalid call parameters", null); :}*/
         ;
 
 arg_list    ::= expression:s1 COMMA arg_list:s2 {: RESULT = new ExpList(s1, s2); :}
-            | /*empty*/ {: :}
+            | expression:s1 {: RESULT = new ExpList(s1, null); :}
             ;
 
