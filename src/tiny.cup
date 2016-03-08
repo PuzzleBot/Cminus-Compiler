@@ -211,12 +211,12 @@ simple_expression   ::= arithmetic_expression:s1 relop:s2 arithmetic_expression:
                     |  arithmetic_expression:s1 {: RESULT = s1; :}
                     ;
 
-relop   ::= LESS_THAN_EQUAL {:RESULT=6/*OpExp.LE*/; :}
-        | LESS_THAN {:RESULT=5/*OpExp.LT*/; :}
-        | GREATER_THAN {:RESULT=7/*OpExp.GT*/; :}
-        | GREATER_THAN_EQUAL {:RESULT=8/*OpExp.GE*/; :}
-        | EQUAL {: RESULT=4/*OpExp.EQ*/;:}
-        | NOT_EQUAL {:RESULT=9/*OpExp.NE*/; :}
+relop   ::= LESS_THAN_EQUAL {:RESULT=OpExp.LE; :}
+        | LESS_THAN {:RESULT=OpExp.LT; :}
+        | GREATER_THAN {:RESULT=OpExp.GT; :}
+        | GREATER_THAN_EQUAL {:RESULT=OpExp.GE; :}
+        | EQUAL {: RESULT=OpExp.EQ;:}
+        | NOT_EQUAL {:RESULT=OpExp.NE; :}
         ;
 
 /*Minimized from additive-expression*/
@@ -225,12 +225,12 @@ arithmetic_expression   ::= arithmetic_expression:s1 addop:s2 arithmetic_express
                         | factor:s1 {: :}
                         ;
 
-addop   ::= PLUS {:RESULT=0/*OpExp.PLUS*/; :}
-        | MINUS {:RESULT=1/*OpExp.MINUS*/; :}
+addop   ::= PLUS {:RESULT=OpExp.PLUS; :}
+        | MINUS {:RESULT=OpExp.MINUS; :}
         ;
 
-mulop   ::= MULT {:RESULT=2/*OpExp.MULT*/;  :}
-        | DIV {:RESULT=3/*OpExp.DIV*/;  :}
+mulop   ::= MULT {:RESULT=OpExp.MULT;  :}
+        | DIV {:RESULT=OpExp.DIV;  :}
         ;
 
 factor  ::= LBRACKET expression:s1 RBRACKET {: RESULT = s1; :}
