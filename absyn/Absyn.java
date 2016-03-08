@@ -33,6 +33,30 @@ abstract public class Absyn {
             showTree( (VarExp)tree, spaces );
         else if( tree instanceof WriteExp ) 
             showTree( (WriteExp)tree, spaces );
+        else if( tree instanceof NilExp ) 
+            showTree( (NilExp)tree, spaces );
+         else if( tree instanceof CallExp ) 
+            showTree( (CallExp)tree, spaces );
+         else if( tree instanceof AssignExp ) 
+            showTree( (AssignExp)tree, spaces );
+         else if( tree instanceof WhileExp ) 
+            showTree( (WhileExp)tree, spaces );
+         else if( tree instanceof ReturnExp ) 
+            showTree( (ReturnExp)tree, spaces );
+         else if( tree instanceof CompoundExp ) 
+            showTree( (CompoundExp)tree, spaces );
+         else if( tree instanceof FunctionDec ) 
+            showTree( (FunctionDec)tree, spaces ); 
+         else if( tree instanceof SimpleDec ) 
+            showTree( (SimpleDec)tree, spaces );
+         else if( tree instanceof ArrayDec ) 
+            showTree( (ArrayDec)tree, spaces );
+         else if( tree instanceof NameTy ) 
+            showTree( (NameTy)tree, spaces );
+         else if( tree instanceof VarDecList ) 
+            showTree( (VarDecList)tree, spaces );
+         else if( tree instanceof ExpList ) 
+            showTree( (ExpList)tree, spaces );           
         else {
             indent( spaces );
             System.out.println( "Illegal expression at line " + tree.pos  );
