@@ -120,7 +120,7 @@ precedence left ELSE;
    
 program ::= declaration_list:s1 
         {:  System.out.println( "The abstract syntax tree is:" );
-            Absyn.showTree( RESULT, 0 );
+            Absyn.showTree( s1, 0 );
         :}
         ;
 
