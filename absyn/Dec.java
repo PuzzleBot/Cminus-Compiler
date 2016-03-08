@@ -1,5 +1,5 @@
 package absyn;
 
-abstract class Dec{
+public abstract class Dec extends Absyn{
 
 }
