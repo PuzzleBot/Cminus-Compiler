@@ -91,6 +91,8 @@ identifier = {letter}+
    This section contains regular expressions and actions, i.e. Java
    code, that will be executed when the scanner matches the associated
    regular expression. */
+
+\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/   { System.out.print(yytext()); /* skip comments */ }
    
 "if"               { System.out.print(yytext()); return symbol(sym.IF); }
 "else"             { System.out.print(yytext()); return symbol(sym.ELSE); }
@@ -123,5 +125,4 @@ identifier = {letter}+
 {number}                                      { System.out.print(yytext()); return symbol(sym.NUM, Integer.parseInt(yytext())); }
 {identifier}                                  { System.out.print(yytext()); return symbol(sym.ID, yytext()); }
 {WhiteSpace}+                                 { System.out.print(yytext()); /* skip whitespace */ }   
-"/\*([^*]|{[ \r\n\t]}|(\*+([^*/]|[ \r\n\t])))*\*+/"   { System.out.print(yytext()); /* skip comments */ }
 .                                             { System.out.print(yytext()); return symbol(sym.error); }
