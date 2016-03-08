@@ -132,7 +132,8 @@ program ::= declaration_list:s1
         ;
 
 declaration_list    ::= declaration:s1 declaration_list:s2 {: RESULT = new DecList(s1, s2); :}
-                    |  declaration:s1 {:  :}
+                    |  /*Empty*/
+                    /*| error declaration_list:s1 {: this.report_fatal_error("Invalid declaration.", (Object)s1); :}*/
                     ;
 
 declaration ::= var_declaration:s1 {: RESULT = s1; :}
@@ -141,7 +142,7 @@ declaration ::= var_declaration:s1 {: RESULT = s1; :}
 
 var_declaration ::= type_specifier:s1 ID:s2 SEMICOLON {: RESULT = new SimpleDec(s1left, s1, s2); :}
                 | type_specifier:s1 ID:s2 LSQUARE_BRACKET NUM:s3 RSQUARE_BRACKET SEMICOLON {: RESULT = new ArrayDec(s1left, s1, s2, new IntExp(s3left, s3)); :}
-                | error:i SEMICOLON {: System.out.println("Error starting on line " + ileft + ": invalid statement"); :}
+                | error:i SEMICOLON {: System.err.println("Error starting on line " + ileft + ": invalid statement"); :}
                 ;
 
 type_specifier  ::= INT:s1 {: RESULT = new NameTy(s1left, NameTy.INT); :}
@@ -152,7 +153,7 @@ fun_declaration ::= type_specifier:s1 ID:s2 LBRACKET param_list:s3 RBRACKET comp
 s4); :}
                 | type_specifier:s1 ID:s2 LBRACKET VOID RBRACKET compound_stmt:s3 {: RESULT = new FunctionDec(s1left, s1, s2, null, 
 s3); :}
-                | type_specifier:s1 ID:s2 LBRACKET error RBRACKET compound_stmt:s3 {: System.out.println("Error starting on line " + s1left + ": invalid parameters");  :}
+                | type_specifier:s1 ID:s2 LBRACKET error RBRACKET compound_stmt:s3 {: System.err.println("Error starting on line " + s1left + ": invalid parameters");  :}
                 ;
 
 param_list  ::= param:s1 COMMA param_list:s2 {: RESULT = new VarDecList(s1, s2); :}
@@ -164,7 +165,7 @@ param   ::= type_specifier:s1 ID:s2 {: RESULT = new SimpleDec(s1left, s1, s2); :
         ;
 
 compound_stmt   ::= LCURLY_BRACKET:i local_declarations:s1 statement_list:s2 RCURLY_BRACKET {: RESULT = new CompoundExp(ileft, s1, s2); :}
-                | LCURLY_BRACKET:i error RCURLY_BRACKET {: System.out.println("Error on line " + ileft + ": invalid statement"); :}
+                | LCURLY_BRACKET:i error RCURLY_BRACKET {: System.err.println("Error on line " + ileft + ": invalid statement"); :}
                 ;
 
 local_declarations  ::= var_declaration:s1 local_declarations:s2 {: RESULT = new VarDecList(s1, s2); :}
@@ -183,7 +184,7 @@ statement   ::= expression_stmt:s1 {: RESULT = s1; :}
             ;
 
 expression_stmt ::= expression:s1 SEMICOLON {: RESULT = s1; :}
-                | error:i SEMICOLON {: System.out.println("Error on line " + ileft + ": invalid expression"); :}
+                | error:i SEMICOLON {: System.err.println("Error on line " + ileft + ": invalid expression"); :}
                 | SEMICOLON {: :}
                 ;
 
@@ -195,7 +196,7 @@ iteration_stmt  ::= WHILE:i LBRACKET expression:s1 RBRACKET statement:s2 {:RESUL
                 ;
 
 return_stmt ::= RETURN:i SEMICOLON {:RESULT=new ReturnExp(ileft, new NilExp(ileft)); :}
-            | RETURN:i error SEMICOLON {: System.out.println("Error on line " + ileft + ": invalid return");  :} /*error condition*/
+            | RETURN:i error SEMICOLON {: System.err.println("Error on line " + ileft + ": invalid return");  :} /*error condition*/
             | RETURN:i expression:s1 {: RESULT = new ReturnExp(ileft, s1); :}
             ;
 
@@ -209,6 +210,7 @@ var ::= ID:s1 {:RESULT = new SimpleVar(s1left, s1); :}
 
 simple_expression   ::= arithmetic_expression:s1 relop:s2 arithmetic_expression:s3 {:RESULT = new OpExp(s1left, s1, s2, s3); :}
                     |  arithmetic_expression:s1 {: RESULT = s1; :}
+                    |  arithmetic_expression:s1 error arithmetic_expression:s2 {: System.err.println("Error on line " + s1left + ": Invalid comparison operator"); :}
                     ;
 
 relop   ::= LESS_THAN_EQUAL {:RESULT=OpExp.LE; :}
@@ -241,7 +243,7 @@ factor  ::= LBRACKET expression:s1 RBRACKET {: RESULT = s1; :}
 
 call    ::= ID:s1 LBRACKET arg_list:s2 RBRACKET {: RESULT = new CallExp(s1left, s1, s2); :}
         | ID:s1 LBRACKET RBRACKET {: RESULT = new CallExp(s1left, s1, null); :}
-        | ID:s1 LBRACKET error RBRACKET {: System.out.println("Error on line " + s1left + ": invalid call parameters"); :}
+        | ID:s1 LBRACKET error RBRACKET {: System.err.println("Error on line " + s1left + ": invalid call parameters"); :}
         ;
 
 arg_list    ::= expression:s1 COMMA arg_list:s2 {: RESULT = new ExpList(s1, s2); :}
