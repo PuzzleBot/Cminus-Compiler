@@ -78,7 +78,7 @@ terminal String LESS_THAN, LESS_THAN_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, EQ
 terminal String SEMICOLON, COMMA;
 terminal String LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRACKET, RCURLY_BRACKET;
 terminal String ID; 
-terminal int NUM;
+terminal IntExp NUM;
 
 non terminal Absyn program;
 non terminal DecList declaration_list;
@@ -127,7 +127,7 @@ precedence right ELSE;
 program ::= declaration_list:s1 
         {:  RESULT = s1;
             System.out.println( "The abstract syntax tree is:" );
-            //Absyn.showTree( RESULT, 0 );
+            /*Absyn.showTree( RESULT, 0 );*/
         :}
         ;
 
@@ -181,7 +181,7 @@ statement   ::= expression_stmt:s1 {: RESULT = s1; :}
             ;
 
 expression_stmt ::= expression:s1 SEMICOLON {: RESULT = s1; :}
-                | error SEMICOLON {: System.out.println("Error on line " + ileft + ": invalid expression"); :}
+                | error:i SEMICOLON {: System.out.println("Error on line " + ileft + ": invalid expression"); :}
                 | SEMICOLON {: :}
                 ;
 
