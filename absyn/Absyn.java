@@ -15,8 +15,15 @@ abstract public class Absyn {
             tree = tree.tail;
         } 
     }
+    
+    static public void showTree( DecList tree, int spaces ) {
+        while( tree != null ) {
+            showTree( tree.head, spaces );
+            tree = tree.tail;
+        } 
+    }
 
-    static public void showTree( Absyn tree, int spaces ) {
+    static private void showTree( Exp tree, int spaces ) {
         if( tree instanceof AssignExp )
             showTree( (AssignExp)tree, spaces );
         else if( tree instanceof IfExp )
@@ -45,21 +52,10 @@ abstract public class Absyn {
             showTree( (ReturnExp)tree, spaces );
          else if( tree instanceof CompoundExp ) 
             showTree( (CompoundExp)tree, spaces );
-         else if( tree instanceof FunctionDec ) 
-            showTree( (FunctionDec)tree, spaces ); 
-         else if( tree instanceof SimpleDec ) 
-            showTree( (SimpleDec)tree, spaces );
-         else if( tree instanceof ArrayDec ) 
-            showTree( (ArrayDec)tree, spaces );
-         else if( tree instanceof NameTy ) 
-            showTree( (NameTy)tree, spaces );
-         else if( tree instanceof VarDecList ) 
-            showTree( (VarDecList)tree, spaces );
-         else if( tree instanceof ExpList ) 
-            showTree( (ExpList)tree, spaces );    
+ 
         else {
             indent( spaces );
-            System.out.println( "Illegal expression at line " + tree.pos );
+            System.out.println( "Illegal expression at line " + tree.pos);
         }
     }
 
@@ -128,6 +124,12 @@ abstract public class Absyn {
         indent( spaces );
         System.out.println( "ReadExp:" );
         showTree( tree.input, spaces + SPACES );  
+    }
+    
+    static private void showTree( Dec tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "Dec:" );
+        showTree( tree.params, spaces + SPACES );  
     }
 
     static private void showTree( RepeatExp tree, int spaces ) {
@@ -206,5 +208,7 @@ abstract public class Absyn {
         indent( spaces );
         System.out.println( "Var:" );
     }
+    
+    
     
 }

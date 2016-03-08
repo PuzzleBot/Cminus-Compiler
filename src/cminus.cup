@@ -119,15 +119,13 @@ precedence left ELSE;
 /* ----------------------------Grammar Section-------------------- */
    
 program ::= declaration_list:s1 
-        {:  RESULT = s1;
-            System.out.println( "The abstract syntax tree is:" );
+        {:  System.out.println( "The abstract syntax tree is:" );
             Absyn.showTree( RESULT, 0 );
         :}
         ;
 
 declaration_list    ::= declaration:s1 declaration_list:s2 {: RESULT = new DecList(s1, s2); :}
                     | declaration:s1 {: RESULT = new DecList(s1, null); :}
-                    ;
 
 declaration ::= var_declaration:s1 {: RESULT = s1; :}
             |  fun_declaration:s1 {: RESULT = s1; :}
