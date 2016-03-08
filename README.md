@@ -5,10 +5,10 @@ generate an executable program called "main".
 
 To test source code like "euclid.cm", type 
 
-    "java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ Main test/euclid.cm"
+    "java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ Main FILE=<filename>"
+    replacing <filename> with a path to a cminus file.
 
-
-and the syntax tree will be displayed on the screen.
+The syntax tree will be displayed on the screen.
 
   To rebuild the parser, type "make clean" and type "make" again.
 
