@@ -231,9 +231,9 @@ operation   ::= PLUS {:RESULT=OpExp.PLUS; :}
             ;
 
 factor  ::= LBRACKET expression:s1 RBRACKET {: RESULT = s1; :}
-        | var:s1 {: RESULT = new VarExp(s1left, s1);:}
+        | var:s1 {: RESULT = new VarExp(s1left, s1); :}
         | call:s1 {: RESULT = s1; :}
-        | NUM:s1 {: RESULT = new IntExp(s1left, s1);:}
+        | NUM:s1 {: RESULT = new IntExp(s1left, s1); :}
         ;
 
 call    ::= ID:s1 LBRACKET arg_list:s2 RBRACKET {: RESULT = new CallExp(s1left, s1, s2); :}
