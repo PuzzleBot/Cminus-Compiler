@@ -1,6 +1,7 @@
 JAVA=java
 JAVAC=javac
 JFLEX=jflex
+FILE=test/euclid.cm
 CLASSPATH=-classpath /usr/share/java/cup.jar:./cup/java-cup-11.jar:.:
 CUP=$(JAVA) $(CLASSPATH) java_cup.Main -expect 3 <
 #CUP=cup
@@ -29,4 +30,4 @@ clean:
 	rm -f bin/parser.java bin/lexer.java bin/sym.java *.class bin/*.class bin/*.java absyn/*.class *~
 
 run:
-	java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ Main test/euclid.cm
+	java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ Main $(FILE)
