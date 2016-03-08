@@ -164,7 +164,7 @@ compound_stmt   ::= LCURLY_BRACKET:i local_declarations:s1 statement_list:s2 RCU
                 ;
 
 local_declarations  ::= var_declaration:s1 local_declarations:s2 {: RESULT = new VarDecList(s1, s2); :}
-                    | var_declaration:s1 {: RESULT = new VarDecList(s1, null); :}
+                    | /*Empty*/ {: RESULT = new VarDecList(null, null); :}
                     ;
 
 statement_list  ::= statement:s1 statement_list:s2 {: RESULT = new ExpList(s1, s2);:}
@@ -180,7 +180,6 @@ statement   ::= expression_stmt:s1 {: RESULT = s1; :}
 
 expression_stmt ::= expression:s1 SEMICOLON {: RESULT = s1; :}
                 | error:i SEMICOLON {: parser.report_error("Error on line " + ileft + ": invalid expression", null); :}
-                | SEMICOLON {: :}
                 ;
 
 selection_stmt  ::= selection_else_stmt:s1 {:RESULT = s1;:}
@@ -194,8 +193,8 @@ iteration_stmt  ::= WHILE:i LBRACKET expression:s1 RBRACKET statement:s2 {:RESUL
                 ;
 
 return_stmt ::= RETURN:i SEMICOLON {:RESULT=new ReturnExp(ileft, new NilExp(ileft)); :}
-            | RETURN:i error SEMICOLON {: parser.report_error("Error on line " + ileft + ": invalid return", null);  :} /*error condition*/
             | RETURN:i expression:s1 {: RESULT = new ReturnExp(ileft, s1); :}
+            | RETURN:i error SEMICOLON {: parser.report_error("Error on line " + ileft + ": invalid return", null);  :} /*error condition*/
             ;
 
 expression  ::= var:s1 ASSIGN expression:s2 {: RESULT = new AssignExp(s1left, s1, s2); :}
