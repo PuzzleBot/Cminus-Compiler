@@ -1,5 +1,5 @@
 /* A program that uses Euclid’s algorithm to 
-compute gcd */
+compute gcd (Bad function call)*/
 
 int gcd (int u, int v ) {
     if (v == 0) 
@@ -11,7 +11,7 @@ int gcd (int u, int v ) {
 void main (void) {
     int x;
     int y;
-    x = input(); 
+    x = input(x ==== 5); 
     y = input();
     output( gcd(x, y) );
 }

@@ -241,6 +241,7 @@ factor  ::= LBRACKET expression:s1 RBRACKET {: RESULT = s1; :}
 
 call    ::= ID:s1 LBRACKET arg_list:s2 RBRACKET {: RESULT = new CallExp(s1left, s1, s2); :}
         | ID:s1 LBRACKET RBRACKET {: RESULT = new CallExp(s1left, s1, null); :}
+        | ID:s1 LBRACKET error RBRACKET {: System.out.println("Error on line " + s1left + ": invalid call parameters"); :}
         ;
 
 arg_list    ::= expression:s1 COMMA arg_list:s2 {: RESULT = new ExpList(s1, s2); :}
