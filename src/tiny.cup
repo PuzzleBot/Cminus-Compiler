@@ -78,7 +78,7 @@ terminal String LESS_THAN, LESS_THAN_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, EQ
 terminal String SEMICOLON, COMMA;
 terminal String LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRACKET, RCURLY_BRACKET;
 terminal String ID; 
-terminal int NUM;
+terminal Integer NUM;
 
 non terminal Absyn program;
 non terminal DecList declaration_list;
