@@ -13,12 +13,12 @@ allClasses:
 	$(JAVAC) $(CLASSPATH) absyn/*.java src/*.java bin/*.java
 	mv src/*.class ./bin/
 
-bin/lexer.java: src/tiny.flex
-	$(JFLEX) src/tiny.flex
+bin/lexer.java: src/cminus.flex
+	$(JFLEX) src/cminus.flex
 	mv src/Lexer.java bin/Lexer.java
 
-bin/parser.java: src/tiny.cup
-	$(CUP) src/tiny.cup
+bin/parser.java: src/cminus.cup
+	$(CUP) src/cminus.cup
 	mkdir -p ./bin
 	mv parser.java bin/parser.java
 	mv sym.java bin/sym.java

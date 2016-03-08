@@ -5,9 +5,9 @@ A JFlex+Cup implementation for the C-Minus language.
   To build the entire program, type "make" in the current directory, which will 
 generate an executable program called "tiny".
 
-  To test source code like "gcd.tiny", type 
+  To test source code like "gcd.tiny", type:
 
-    "java -classpath /usr/share/java/cup.jar:. Main gcd.tiny" 
+    "java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ Main gcd.tiny"
 
 and the syntax tree will be displayed on the screen.
 
