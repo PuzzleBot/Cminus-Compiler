@@ -56,10 +56,10 @@ abstract public class Absyn {
          else if( tree instanceof VarDecList ) 
             showTree( (VarDecList)tree, spaces );
          else if( tree instanceof ExpList ) 
-            showTree( (ExpList)tree, spaces );           
+            showTree( (ExpList)tree, spaces );    
         else {
             indent( spaces );
-            System.out.println( "Illegal expression at line " + tree.pos  );
+            System.out.println( "Illegal expression at line " + tree.pos );
         }
     }
 
