@@ -77,24 +77,29 @@ terminal String PLUS, MINUS, MULT, DIV;
 terminal String LESS_THAN, LESS_THAN_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, EQUAL, NOT_EQUAL, ASSIGN;
 terminal String SEMICOLON, COMMA;
 terminal String LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRACKET, RCURLY_BRACKET;
-terminal String ID, NUM;
+terminal String ID; 
+terminal int NUM;
 
 non terminal Absyn program;
 non terminal DecList declaration_list;
-non terminal VarDec declaration;
-non terminal SimpleDec var_declaration;
+non terminal VarDec declaration, var_declaration;
 non terminal FunctionDec fun_declaration;
 
-non terminal param_list, param, compound_stmt, local_declarations, statement_list, statement;
-non terminal expression_stmt, selection_stmt, iteration_stmt, return_stmt; 
-non terminal VarExp var;
-non terminal simple_expression;
+non terminal VarDecList param_list, local_declarations;
+non terminal SimpleDec param;
+non terminal CompoundExp compound_stmt;
 
-non terminal OpExp arithmetic_expression; 
+non terminal IfExp selection_stmt; 
+non terminal WhileExp iteration_stmt; 
+non terminal ReturnExp return_stmt; 
+non terminal Exp var;
+
+non terminal OpExp arithmetic_expression, simple_expression;
 non terminal int addop, mulop, relop, type_specifier;
-non terminal Exp expression, factor;
+non terminal Exp expression, factor, statement, expression_stmt;
 non terminal CallExp call;
-non terminal ExpList arg_list;
+non terminal ExpList arg_list, statement_list;
+
 
 /*If no other rules are satisfied, it is an error*/
 precedence left error;
@@ -117,7 +122,11 @@ precedence right ELSE;
 
 /* ----------------------------Grammar Section-------------------- */
    
-program ::= declaration_list:s1 {: :}
+program ::= declaration_list:s1 
+        {:  RESULT = s1;
+            System.out.println( "The abstract syntax tree is:" );
+            Absyn.showTree( RESULT, 0 ) 
+        :}
         ;
 
 declaration_list    ::= declaration:s1 declaration_list:s2 {: RESULT = new DecList(s1, s2); :}
@@ -128,48 +137,49 @@ declaration ::= var_declaration:s1 {: RESULT = s1; :}
             |  fun_declaration:s1 {: RESULT = s1; :}
             ;
 
-var_declaration ::= type_specifier:s1 ID:s2 SEMICOLON {: :}
-                | type_specifier:s1 ID:s2 LSQUARE_BRACKET NUM:s3 RSQUARE_BRACKET SEMICOLON {: :}
-                | error SEMICOLON {: :}
+var_declaration ::= type_specifier:s1 ID:s2 SEMICOLON {: RESULT = new SimpleDec(s1left, s1, s2); :}
+                | type_specifier:s1 ID:s2 LSQUARE_BRACKET NUM:s3 RSQUARE_BRACKET SEMICOLON {: RESULT = new ArrayDec(s1left, s1, s2, s3); :}
+                | error:i SEMICOLON {: System.out.println("Error starting on line " + ileft + ": invalid statement"); :}
                 ;
 
-type_specifier  ::= INT:s1 {: :}
-                | VOID {: :}
+type_specifier  ::= INT:s1 {: RESULT = NameTy.INT; :}
+                | VOID:s1 {: RESULT = NameTy.VOID; :}
                 ;
 
-fun_declaration ::= type_specifier:s1 ID:s2 LBRACKET param_list:s3 RBRACKET compound_stmt:s4 {: :}
-                | VOID {: :}
+fun_declaration ::= type_specifier:s1 ID:s2 LBRACKET param_list:s3 RBRACKET compound_stmt:s4 {: RESULT = new FunctionDec(s1left, s1, s2, s3, 
+s4); :}
+                | type_specifier:s1 ID:s2 LBRACKET VOID RBRACKET compound_stmt:s3 {: RESULT = new FunctionDec(s1left, s1, s2, null, 
+s3); :}
                 ;
 
-param_list  ::= param_list:s1 COMMA param_list:s2 {: :}
-            | param:s1 {: :}
+param_list  ::= param:s1 COMMA param_list:s2 {: RESULT = new VarDecList(s1, s2); :}
             ;
 
-param   ::= type_specifier:s1 ID:s2 {: :}
-        |  type_specifier:s1 ID:s2 LSQUARE_BRACKET RSQUARE_BRACKET {: :}
+param   ::= type_specifier:s1 ID:s2 {: RESULT = new SimpleDec(s1left, s1, s2); :}
+        |  type_specifier:s1 ID:s2 LSQUARE_BRACKET RSQUARE_BRACKET {: new SimpleDec(s1left, s1, s2); :}
         ;
 
-compound_stmt   ::= LCURLY_BRACKET local_declarations:s1 statement_list:s2 RCURLY_BRACKET {: :}
-                | LCURLY_BRACKET error RCURLY_BRACKET {: :}
+compound_stmt   ::= LCURLY_BRACKET:i local_declarations:s1 statement_list:s2 RCURLY_BRACKET {: RESULT = new CompoundExp(ileft, s1, s2); :}
+                | LCURLY_BRACKET:i error RCURLY_BRACKET {: System.out.println("Error on line " + ileft + ": invalid statement"); :}
                 ;
 
-local_declarations  ::= local_declarations:s1 var_declaration:s2 {: :}
+local_declarations  ::= var_declaration:s1 local_declarations:s2 {: RESULT = new VarDecList(s1, s2); :}
                     | /*Empty*/ {: :}
                     ;
 
-statement_list  ::= statement_list:s1 statement:s2 {: :}
+statement_list  ::= statement:s1 statement_list:s2 {: RESULT = new ExpList(s1, s2);:}
                 | /*Empty*/ {: :}
                 ;
 
-statement   ::= expression_stmt:s1 {: :}
-            | compound_stmt:s1 {: :}
-            | selection_stmt:s1 {: :}
-            | iteration_stmt:s1 {: :}
-            | return_stmt:s1 {: :}
+statement   ::= expression_stmt:s1 {: RESULT = s1; :}
+            | compound_stmt:s1 {: RESULT = s1; :}
+            | selection_stmt:s1 {: RESULT = s1; :}
+            | iteration_stmt:s1 {: RESULT = s1; :}
+            | return_stmt:s1 {: RESULT = s1; :}
             ;
 
-expression_stmt ::= expression:s1 SEMICOLON {: :}
-                | error SEMICOLON {: :}
+expression_stmt ::= expression:s1 SEMICOLON {: RESULT = s1; :}
+                | error SEMICOLON {: System.out.println("Error on line " + ileft + ": invalid expression"); :}
                 | SEMICOLON {: :}
                 ;
 
@@ -182,19 +192,19 @@ iteration_stmt  ::= WHILE:i LBRACKET expression:s1 RBRACKET statement:s2 {:RESUL
 
 return_stmt ::= RETURN:i SEMICOLON {:RESULT=new ReturnExp(ileft, new NilExp(ileft)); :}
             | RETURN:i error SEMICOLON {: System.out.println("Error on line " + ileft + ": invalid return");  :} /*error condition*/
-            | RETURN:i expression:s1 {:RESULT = new ReturnExp(ileft, s1); :}
+            | RETURN:i expression:s1 {: RESULT = new ReturnExp(ileft, s1); :}
             ;
 
 expression  ::= var:s1 ASSIGN expression:s2 {: RESULT = new AssignExp(s1left, s1, s2); :}
-            | simple_expression:s1 {: RESULT = s1; :}   //this condition is wrong now, fix soon
+            | simple_expression:s1 {: RESULT = s1; :} 
             ;
 
 var ::= ID:s1 {:RESULT = new VarExp(s1left, s1); :}
-    | ID:s1 LSQUARE_BRACKET expression:s2 RSQUARE_BRACKET {: RESULT = new VarExp(s1left, s1); :}
+    | ID:s1 LSQUARE_BRACKET expression:s2 RSQUARE_BRACKET {: RESULT = new AssignExp(s1left, s1, s2); :}
     ;
 
 simple_expression   ::= arithmetic_expression:s1 relop:s2 arithmetic_expression:s3 {:RESULT = new OpExp(s1left, s1, s2, s3); :}
-                    |  arithmetic_expression:s1 {: :}
+                    |  arithmetic_expression:s1 {: RESULT = s1; :}
                     ;
 
 relop   ::= LESS_THAN_EQUAL {:RESULT=OpExp.LE; :}
@@ -206,16 +216,8 @@ relop   ::= LESS_THAN_EQUAL {:RESULT=OpExp.LE; :}
         ;
 
 /*Minimized from additive-expression*/
-arithmetic_expression   ::= arithmetic_expression:s1 addop:s2 arithmetic_expression:s3 
-                        {: 
-                        System.out.println(s2);
-                        RESULT = new OpExp(s1left, s1, s2, s3);
-                        :}
-                        | arithmetic_expression:s1 mulop:s2 arithmetic_expression:s3 
-                        {: 
-                        System.out.println(s2);
-                        RESULT = new OpExp(s1left, s1, s2, s3);
-                        :}
+arithmetic_expression   ::= arithmetic_expression:s1 addop:s2 arithmetic_expression:s3 {: RESULT = new OpExp(s1left, s1, s2, s3); :}
+                        | arithmetic_expression:s1 mulop:s2 arithmetic_expression:s3 {: RESULT = new OpExp(s1left, s1, s2, s3); :}
                         | factor:s1 {: :}
                         ;
 
