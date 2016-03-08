@@ -117,7 +117,7 @@ abstract public class Absyn {
     static private void showTree( VarExp tree, int spaces ) {
         indent( spaces );
         System.out.println( "VarExp: " + tree.name );
-          showTree( tree.variable, spaces );
+          showTree( tree.name, spaces );
     }
     
     static private void showTree( NilExp tree, int spaces ) {
@@ -178,5 +178,9 @@ abstract public class Absyn {
         System.out.println( "VarDec:" );
     }
    
+   static private void showTree( Var tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "Var:" );
+    }
     
 }
