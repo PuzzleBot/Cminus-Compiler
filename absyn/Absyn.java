@@ -124,5 +124,47 @@ abstract public class Absyn {
         System.out.println( "WriteExp:" );
         showTree( tree.output, spaces + SPACES ); 
     }
+    
+    static private void showTree( NilExp tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "NilExp:" );
+        showTree( tree.output, spaces + SPACES ); 
+    }
+    
+    static private void showTree( CallExp tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "CallExp:" );
+        showTree( tree.output, spaces + SPACES ); 
+    }
+    
+    static private void showTree( AssignExp tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "AssignExp:" );
+        showTree( tree.output, spaces + SPACES ); 
+    }
+    
+    static private void showTree( IfExp tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "IfExp:" );
+        showTree( tree.output, spaces + SPACES ); 
+    }
+    
+    static private void showTree( WhileExp tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "WhileExp:" );
+        showTree( tree.output, spaces + SPACES ); 
+    }
+    
+    static private void showTree( ReturnExp tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "ReturnExp:" );
+        showTree( tree.output, spaces + SPACES ); 
+    }
+    
+    static private void showTree( CompoundExp tree, int spaces ) {
+        indent( spaces );
+        System.out.println( "CompoundExp:" );
+        showTree( tree.output, spaces + SPACES ); 
+    }
 
 }
