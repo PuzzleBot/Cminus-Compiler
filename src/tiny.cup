@@ -152,6 +152,7 @@ fun_declaration ::= type_specifier:s1 ID:s2 LBRACKET param_list:s3 RBRACKET comp
 s4); :}
                 | type_specifier:s1 ID:s2 LBRACKET VOID RBRACKET compound_stmt:s3 {: RESULT = new FunctionDec(s1left, s1, s2, null, 
 s3); :}
+                | type_specifier:s1 ID:s2 LBRACKET error RBRACKET compound_stmt:s3 {: System.out.println("Error starting on line " + s1left + ": invalid parameters");  :}
                 ;
 
 param_list  ::= param:s1 COMMA param_list:s2 {: RESULT = new VarDecList(s1, s2); :}
