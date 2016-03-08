@@ -243,6 +243,6 @@ call    ::= ID:s1 LBRACKET arg_list:s2 RBRACKET {: RESULT = new CallExp(s1left, 
         ;
 
 arg_list    ::= expression:s1 COMMA arg_list:s2 {: RESULT = new ExpList(s1, s2); :}
-            | expression:s1 {: RESULT = s1; :}
+            | /*Empty*/ {: :}
             ;
 
