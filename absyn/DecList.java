@@ -1,8 +1,8 @@
 package absyn;
 
-class DecList extends Absyn{
-    Dec head;
-    DecList tail;
+public class DecList extends Absyn{
+    public Dec head;
+    public DecList tail;
     
     
     public DecList(Dec head,DecList tail){

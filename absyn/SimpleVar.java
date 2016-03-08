@@ -1,6 +1,6 @@
 package absyn;
 public class SimpleVar extends Var{
-    String name;
+    public String name;
     
     public SimpleVar(int pos, String name){
         this.name=name;
