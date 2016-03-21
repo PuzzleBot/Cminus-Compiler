@@ -2,6 +2,9 @@ import absyn.*;
 import java.util.*;
 
 public class FunctionIdentifier extends Identifier{
+    public static final int FUNCTION_INT = 3;
+    public static final int FUNCTION_VOID = 4;
+    
     private ArrayList<Identifier> args;
     
     public FunctionIdentifier(String name, int type){

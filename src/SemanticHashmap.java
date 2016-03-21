@@ -8,8 +8,8 @@ public class SemanticHashmap{
         hashMapList = new Stack<HashMap<String, Identifier>>();
         hashMapList.push(new HashMap<String, Identifier>());
         
-        this.insertIdentifier(new FunctionIdentifier("input", Identifier.FUNCTION_VOID));
-        this.insertIdentifier(new FunctionIdentifier("output", Identifier.FUNCTION_VOID));
+        this.insertIdentifier(new FunctionIdentifier("input", FunctionIdentifier.FUNCTION_VOID));
+        this.insertIdentifier(new FunctionIdentifier("output", FunctionIdentifier.FUNCTION_VOID));
     }
     
     public void insertIdentifier(Identifier newIdentifier){
@@ -68,7 +68,7 @@ public class SemanticHashmap{
     /*Test main*/
     public static void main(String args[]){
         SemanticHashmap symbolTable = new SemanticHashmap();
-        FunctionIdentifier gcdIdentifier = new FunctionIdentifier("gcd", Identifier.FUNCTION_INT);
+        FunctionIdentifier gcdIdentifier = new FunctionIdentifier("gcd", FunctionIdentifier.FUNCTION_INT);
         gcdIdentifier.addToArgs(new Identifier("x", Identifier.INT));
         gcdIdentifier.addToArgs(new Identifier("y", Identifier.INT));
         

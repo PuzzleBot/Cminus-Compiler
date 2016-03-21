@@ -4,8 +4,6 @@ import java.util.*;
 public class Identifier{
     public static final int INT = 1;
     public static final int INT_ARRAY = 2;
-    public static final int FUNCTION_INT = 3;
-    public static final int FUNCTION_VOID = 4;
     
     protected String name;
     protected int type;
