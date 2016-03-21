@@ -31,3 +31,7 @@ clean:
 
 run:
 	java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ Main $(FILE)
+
+
+testSymTable:
+	java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ SemanticHashmap

@@ -7,6 +7,9 @@ public class SemanticHashmap{
     public SemanticHashmap(){
         hashMapList = new Stack<HashMap<String, Identifier>>();
         hashMapList.push(new HashMap<String, Identifier>());
+        
+        this.insertIdentifier(new FunctionIdentifier("input", Identifier.FUNCTION_VOID));
+        this.insertIdentifier(new FunctionIdentifier("output", Identifier.FUNCTION_VOID));
     }
     
     public void insertIdentifier(Identifier newIdentifier){
@@ -38,14 +41,15 @@ public class SemanticHashmap{
         HashMap<String, Identifier> deletedScope = hashMapList.pop();
     }
     
-    public void printInnerScope(int scopeDepth){
+    public void printInnerScope(){
         Iterator<Map.Entry<String, Identifier>> scopeIterator = hashMapList.peek().entrySet().iterator();
         Map.Entry<String, Identifier> currentEntry;
         Identifier currentIdentifier;
+        int scopeDepth = hashMapList.size();
         
         int i;
         
-        for(i = 0; i <= scopeDepth; i++){
+        for(i = 0; i < scopeDepth; i++){
             System.out.print("    ");
         }
         System.out.println("--Identifiers: Variable scope depth " + scopeDepth + " --");
@@ -54,10 +58,31 @@ public class SemanticHashmap{
             currentEntry = scopeIterator.next();
             
             currentIdentifier = currentEntry.getValue();
-            for(i = 0; i <= scopeDepth; i++){
+            for(i = 0; i < scopeDepth; i++){
                 System.out.print("    ");
-                System.out.println(currentIdentifier.toString());
             }
+            System.out.println(currentIdentifier.toString());
         }
+    }
+    
+    /*Test main*/
+    public static void main(String args[]){
+        SemanticHashmap symbolTable = new SemanticHashmap();
+        FunctionIdentifier gcdIdentifier = new FunctionIdentifier("gcd", Identifier.FUNCTION_INT);
+        gcdIdentifier.addToArgs(new Identifier("x", Identifier.INT));
+        gcdIdentifier.addToArgs(new Identifier("y", Identifier.INT));
+        
+        symbolTable.insertIdentifier(gcdIdentifier);
+        symbolTable.insertIdentifier(new Identifier("globalX", Identifier.INT));
+        
+        symbolTable.newInnerScope();
+        symbolTable.insertIdentifier(new Identifier("varX", Identifier.INT));
+        symbolTable.insertIdentifier(new Identifier("varY", Identifier.INT));
+        
+        symbolTable.printInnerScope();
+        symbolTable.deleteInnerScope();
+        
+        symbolTable.printInnerScope();
+        symbolTable.deleteInnerScope();
     }
 }
