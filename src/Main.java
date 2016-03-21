@@ -12,13 +12,40 @@
  */
 
 import java.io.*;
+import absyn.*;
 
 class Main {
     static public void main(String argv[]) {
+        boolean showTreeFlag = false;
+        boolean showTableFlag = false;
+        boolean genCodeFlag = false;
+        int i;
+        
+        for(i = 0; i < argv.length; i++){
+            if(argv[i].equals("-a")){
+                showTreeFlag = true;
+            }
+            
+            if(argv[i].equals("-e")){
+                showTableFlag = true;
+            }
+            
+            if(argv[i].equals("-c")){
+                genCodeFlag = true;
+            }
+        }
+        
         /* Start the parser */
         try {
             parser p = new parser(new Lexer(new FileReader(argv[0])));
+            
+            /*Result is usually ExpList*/
             Object result = p.parse().value;
+            
+            if(showTreeFlag == true){
+                System.out.println( "The abstract syntax tree is:" );
+                Absyn.showTree( (DecList)result, 0 );
+            }
         } catch (Exception e) {
             /* do cleanup here -- possibly rethrow e */
             e.printStackTrace();

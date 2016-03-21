@@ -30,7 +30,7 @@ clean:
 	rm -f bin/parser.java bin/lexer.java bin/sym.java *.class bin/*.class bin/*.java absyn/*.class *~
 
 run:
-	java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ Main $(FILE)
+	java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ Main $(FILE) -a -e -c
 
 
 testSymTable:

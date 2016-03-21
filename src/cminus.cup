@@ -119,8 +119,7 @@ precedence left ELSE;
 /* ----------------------------Grammar Section-------------------- */
    
 program ::= declaration_list:s1 
-        {:  System.out.println( "The abstract syntax tree is:" );
-            Absyn.showTree( s1, 0 );
+        {:  
             RESULT = s1;
         :}
         ;
