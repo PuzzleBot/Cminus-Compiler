@@ -39,7 +39,7 @@ class Main {
         try {
             parser p = new parser(new Lexer(new FileReader(argv[0])));
             
-            /*Result is usually ExpList*/
+            /*Result is usually DecList*/
             Object result = p.parse().value;
             
             if(showTreeFlag == true){
