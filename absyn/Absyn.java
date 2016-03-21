@@ -193,10 +193,9 @@ abstract public class Absyn {
     }
     
     static private void showTree( VarDecList tree, int spaces ) {
-        indent( spaces );
-        System.out.println( "VarDecList:" );
         if(tree!=null){
-        
+            indent( spaces );
+            System.out.println( "VarDecList:" );
             showTree( tree.head, spaces + SPACES ); 
             showTree( tree.tail, spaces + SPACES ); 
         }
