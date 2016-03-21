@@ -95,7 +95,7 @@ non terminal WhileExp iteration_stmt;
 non terminal ReturnExp return_stmt; 
 non terminal Var var;
 
-non terminal OpExp arithmetic_expression, simple_expression;
+non terminal Exp arithmetic_expression, simple_expression;
 non terminal Integer operation, relop;
 non terminal NameTy type_specifier;
 non terminal Exp expression, factor, statement, expression_stmt;
@@ -160,7 +160,7 @@ param_list  ::= param:s1 COMMA param_list:s2 {: RESULT = new VarDecList(s1, s2);
             ;
 
 param   ::= type_specifier:s1 ID:s2 {: RESULT = new SimpleDec(s1left, s1, s2); :}
-        |  type_specifier:s1 ID:s2 LSQUARE_BRACKET RSQUARE_BRACKET {: new SimpleDec(s1left, s1, s2); :}
+        |  type_specifier:s1 ID:s2 LSQUARE_BRACKET RSQUARE_BRACKET {: new ArrayDec(s1left, s1, s2, new IntExp(s1left, 0)); :}
         ;
 
 compound_stmt   ::= LCURLY_BRACKET:i local_declarations:s1 statement_list:s2 RCURLY_BRACKET {: RESULT = new CompoundExp(ileft, s1, s2); :}
@@ -226,7 +226,7 @@ relop   ::= LESS_THAN_EQUAL {:RESULT=OpExp.LE; :}
 
 /*Minimized from additive-expression*/
 arithmetic_expression   ::= arithmetic_expression:s1 operation:s2 arithmetic_expression:s3 {: RESULT = new OpExp(s1left, s1, s2, s3); :}
-                        | factor:s1 {: RESULT = new OpExp(s1left, s1, OpExp.PLUS, new IntExp(s1left, 0)); :}
+                        | factor:s1 {: RESULT = s1; :}
                         ;
 
 operation   ::= PLUS {:RESULT=OpExp.PLUS; :}

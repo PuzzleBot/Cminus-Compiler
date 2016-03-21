@@ -103,7 +103,7 @@ abstract public class Absyn {
                 System.out.println( " / " );
                 break;
             case OpExp.EQ:
-                System.out.println( " = " );
+                System.out.println( " == " );
                 break;
             case OpExp.LT:
                 System.out.println( " < " );
@@ -133,13 +133,15 @@ abstract public class Absyn {
     
     static private void showTree( Dec tree, int spaces ) {
         indent( spaces );
-        System.out.println( "FunctionDec:" );
+        System.out.println( "Dec:" );
         if (tree!=null){
-            System.out.println(tree.result +" ");
-            System.out.println(tree.func);
-            showTree( tree.params, spaces + SPACES );
+            if( tree instanceof ArrayDec )
+                showTree( (ArrayDec)tree, spaces );
+            else if( tree instanceof SimpleDec )
+                showTree( (SimpleDec)tree, spaces );
+            else if( tree instanceof FunctionDec )
+                showTree( (FunctionDec)tree, spaces );
             
-            showTree( tree.body, spaces + SPACES );  
         }
     }
 
@@ -202,23 +204,25 @@ abstract public class Absyn {
     
     static private void showTree( SimpleDec tree, int spaces ) {
         indent( spaces );
-        System.out.println( "SimpleDec:" );
-        System.out.println( tree.typ+" "+tree.name );
+        System.out.println( "SimpleDec: " + tree.name );
+        showTree( tree.typ, spaces + SPACES );
     }
     
     static private void showTree( ArrayDec tree, int spaces ) {
         indent( spaces );
-        System.out.println( "ArrayDec:" );
-        System.out.println( tree.typ+" "+tree.name );
+        System.out.println( "ArrayDec: " + tree.name );
+        showTree( tree.typ, spaces + SPACES );
         showTree( tree.size, spaces + SPACES ); 
     }
     
     static private void showTree( VarDec tree, int spaces ) {
-        indent( spaces );
-        System.out.println( "VarDec:" );
+        if( tree instanceof SimpleDec )
+            showTree((SimpleDec)tree, spaces);
+        else if( tree instanceof ArrayDec )
+            showTree((ArrayDec)tree, spaces);
     }
    
-   static private void showTree( Var tree, int spaces ) {
+    static private void showTree( Var tree, int spaces ) {
         if( tree instanceof SimpleVar )
             showTree((SimpleVar)tree,spaces);
         else if( tree instanceof IndexVar )
@@ -228,7 +232,13 @@ abstract public class Absyn {
     
     static private void showTree( FunctionDec tree, int spaces ) {
         indent( spaces );
-        System.out.println( "FunctionDec:" );
+        System.out.println( "FunctionDec: " +tree.func );
+        
+        if (tree!=null){
+            showTree( tree.result, spaces + SPACES );
+            showTree( tree.params, spaces + SPACES );
+            showTree( tree.body, spaces + SPACES );
+        }
     }
     static private void showTree( SimpleVar tree, int spaces ) {
         indent( spaces );
@@ -238,6 +248,18 @@ abstract public class Absyn {
         indent( spaces );
         System.out.println( "indexed Variable: " +tree.name );
         showTree(tree.index,spaces);
+    }
+    
+    static private void showTree( NameTy tree, int spaces ) {
+        indent( spaces );
+        switch(tree.typ){
+            case NameTy.INT:
+                System.out.println( "NameType: INT");
+                break;
+            case NameTy.VOID:
+                System.out.println( "NameType: VOID");
+                break;
+        }
     }
     
 }
