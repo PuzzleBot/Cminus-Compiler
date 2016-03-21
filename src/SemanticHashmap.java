@@ -79,8 +79,32 @@ public class SemanticHashmap{
         symbolTable.insertIdentifier(new Identifier("varX", Identifier.INT));
         symbolTable.insertIdentifier(new Identifier("varY", Identifier.INT));
         
+        Identifier globalIDtest = symbolTable.lookup("globalX");
+        if(globalIDtest == null){
+            System.out.println("globalX not accessible! (fail)");
+        }
+        else{
+            System.out.println("globalX is accessible! (pass)");
+        }
+        
+        globalIDtest = symbolTable.lookup("globalY");
+        if(globalIDtest == null){
+            System.out.println("globalY not accessible! (pass)");
+        }
+        else{
+            System.out.println("globalY is accessible! (fail)");
+        }
+        
         symbolTable.printInnerScope();
         symbolTable.deleteInnerScope();
+        
+        Identifier scopedIDtest = symbolTable.lookup("varX");
+        if(scopedIDtest == null){
+            System.out.println("varX not accessible! (pass)");
+        }
+        else{
+            System.out.println("varX is accessible! (fail)");
+        }
         
         symbolTable.printInnerScope();
         symbolTable.deleteInnerScope();

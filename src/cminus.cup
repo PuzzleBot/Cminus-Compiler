@@ -80,7 +80,7 @@ terminal String LBRACKET, RBRACKET, LSQUARE_BRACKET, RSQUARE_BRACKET, LCURLY_BRA
 terminal String ID; 
 terminal Integer NUM;
 
-non terminal Absyn program;
+non terminal DecList program;
 non terminal DecList declaration_list;
 non terminal Dec declaration;
 non terminal VarDec var_declaration;
@@ -121,6 +121,7 @@ precedence left ELSE;
 program ::= declaration_list:s1 
         {:  System.out.println( "The abstract syntax tree is:" );
             Absyn.showTree( s1, 0 );
+            RESULT = s1;
         :}
         ;
 
