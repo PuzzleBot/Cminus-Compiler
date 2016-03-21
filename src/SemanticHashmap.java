@@ -38,5 +38,26 @@ public class SemanticHashmap{
         HashMap<String, Identifier> deletedScope = hashMapList.pop();
     }
     
-    
+    public void printInnerScope(int scopeDepth){
+        Iterator<Map.Entry<String, Identifier>> scopeIterator = hashMapList.peek().entrySet().iterator();
+        Map.Entry<String, Identifier> currentEntry;
+        Identifier currentIdentifier;
+        
+        int i;
+        
+        for(i = 0; i <= scopeDepth; i++){
+            System.out.print("    ");
+        }
+        System.out.println("--Identifiers: Variable scope depth " + scopeDepth + " --");
+        
+        while(scopeIterator.hasNext() == true){
+            currentEntry = scopeIterator.next();
+            
+            currentIdentifier = currentEntry.getValue();
+            for(i = 0; i <= scopeDepth; i++){
+                System.out.print("    ");
+                System.out.println(currentIdentifier.toString());
+            }
+        }
+    }
 }
