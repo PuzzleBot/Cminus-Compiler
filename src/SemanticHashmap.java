@@ -2,10 +2,10 @@ import absyn.*;
 import java.util.*;
 
 public class SemanticHashmap{
-    public Stack<HashMap<Identifier>> hashMapList;
+    public Stack<HashMap<String, Identifier>> hashMapList;
 
     public SemanticHashmap(){
-        hashMapList = new Stack<HashMap<Identifier>>;
+        hashMapList = new Stack<HashMap<String, Identifier>>();
     }
     
     public void insert(Identifier newIdentifier){
@@ -13,7 +13,7 @@ public class SemanticHashmap{
     }
     
     public Identifier lookup(String identifierName){
-        
+        return hashMapList.peek().get(identifierName);
     }
     
     public void deleteInnerScope(){
