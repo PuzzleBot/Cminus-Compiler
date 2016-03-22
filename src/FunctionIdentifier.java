@@ -12,14 +12,17 @@ public class FunctionIdentifier extends Identifier{
         args = new ArrayList<Identifier>();
     }
     
+    /*Add a new argument identifier to the function's set of arguments.*/
     public void addToArgs(Identifier newArg){
         args.add(newArg);
     }
     
+    /*Get the argument identifiers of the function*/
     public ArrayList<Identifier> getArgList(){
         return args;
     }
     
+    /*ToString override*/
     public String toString(){
         Iterator<Identifier> argIterator = args.iterator();
         int currentType;

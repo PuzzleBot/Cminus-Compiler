@@ -4,6 +4,7 @@ import java.util.*;
 public class SemanticHashmap{
     public Stack<HashMap<String, Identifier>> hashMapList;
 
+    /*Constructor for a new syntax table. Automatically declares input() and output().*/
     public SemanticHashmap(){
         hashMapList = new Stack<HashMap<String, Identifier>>();
         hashMapList.push(new HashMap<String, Identifier>());
@@ -12,11 +13,14 @@ public class SemanticHashmap{
         this.insertIdentifier(new FunctionIdentifier("output", FunctionIdentifier.FUNCTION_VOID));
     }
     
+    /*Insert (declare) a new identifier in the symbol table, with its type.*/
     public void insertIdentifier(Identifier newIdentifier){
         /*Put the new identifier into the innermost scope*/
         hashMapList.peek().put(newIdentifier.getName(), newIdentifier);
     }
     
+    /*Look for an identifier with the matching name, prioritizing identifiers in the
+      most inner scope.*/
     public Identifier lookup(String identifierName){
         Identifier matchingIdentifier;
         int i;
@@ -33,6 +37,7 @@ public class SemanticHashmap{
         return null;
     }
     
+    /*Check if the innermost identifier with the matching name has the given type/return type.*/
     public boolean typeCheck(String identifierName, int type){
         /*Type may only be Identifier.INT, Identifier.INT_ARRAY or Identifier.VOID*/
         Identifier theIdentifier = this.lookup(identifierName);
@@ -45,6 +50,8 @@ public class SemanticHashmap{
         }
     }
     
+    /*Check if the innermost identifier with the matching name is a function and
+      has the given number of arguments*/
     public boolean functionArgCheck(String identifierName, ArrayList<Integer> argTypes){
         /*argTypes is an arraylist of integers containing the types of the given arguments,
           in order*/
@@ -78,14 +85,17 @@ public class SemanticHashmap{
         return true;
     }
     
+    /*Create a new scope inside the current scope*/
     public void newInnerScope(){
         hashMapList.push(new HashMap<String, Identifier>());
     }
     
+    /*Exit the innermost scope*/
     public void deleteInnerScope(){
         HashMap<String, Identifier> deletedScope = hashMapList.pop();
     }
     
+    /*Print all identifiers local to the current scope*/
     public void printInnerScope(){
         Iterator<Map.Entry<String, Identifier>> scopeIterator = hashMapList.peek().entrySet().iterator();
         Map.Entry<String, Identifier> currentEntry;

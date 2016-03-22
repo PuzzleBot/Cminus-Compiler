@@ -14,6 +14,7 @@ public class Identifier{
         this.type = type;
     }
     
+    /*Get methods*/
     public String getName(){
         return name;
     }
@@ -22,6 +23,7 @@ public class Identifier{
         return type;
     }
     
+    /*ToString override*/
     public String toString(){
         switch(type){
             case INT:
