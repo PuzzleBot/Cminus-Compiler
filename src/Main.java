@@ -1,14 +1,10 @@
 /*
- Created by: Fei Song
- File Name: Main.java
- To Build:
- After the scanner, tiny.flex, and the parser, tiny.cup, have been created.
- javac Main.java
+ Created by: 
+    Brandon Tan
+    George Chapman-Brown
  
- To Run:
- java -classpath /usr/share/java/cup.jar:. Main gcd.tiny
- 
- where gcd.tiny is an test input file for the tiny language.
+ Main.java
+ - Main driver class for the Cminus compiler
  */
 
 import java.io.*;
@@ -44,13 +40,20 @@ class Main {
             /*Result is usually DecList*/
             Object result = p.parse().value;
             
+            /*Print the AST if the flag says to print it*/
             Absyn.showAST = showTreeFlag;
-            Absyn.showMap = showTableFlag;
-            
+            Absyn.showMap = false;
             if(showTreeFlag == true){
                 System.out.println( "The abstract syntax tree is:" );
+                Absyn.showTree( (DecList)result, 0 );
             }
-            Absyn.showTree( (DecList)result, 0 );
+
+            /*Print the symbol table if the flag says to print it*/
+            Absyn.showAST = false;
+            Absyn.showMap = showTableFlag;
+            if(showTableFlag == true){
+                Absyn.showTree( (DecList)result, 0 );
+            }
 
         } catch (Exception e) {
             /* do cleanup here -- possibly rethrow e */

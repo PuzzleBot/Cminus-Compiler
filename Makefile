@@ -33,6 +33,15 @@ clean:
 run:
 	java $(RUNCLASSPATH) Main $(FILE) -a -s -c
 
+runAST:
+	java $(RUNCLASSPATH) Main $(FILE) -a
+
+runTable:
+	java $(RUNCLASSPATH) Main $(FILE) -s
+
+runCodegen:
+	java $(RUNCLASSPATH) Main $(FILE) -c
+
 
 testSymTable:
 	java $(RUNCLASSPATH) symtable/SemanticHashmap

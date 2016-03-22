@@ -1,9 +1,12 @@
 /*
-  Created by: Fei Song
-  File Name: tiny.cup
-  To Build: java java_cup.Main < tiny.cup
+Created by:
+    Brandon Tan
+    George Chapman-Brown
+
+cminus.cup
+- Parser component
 */
-   
+
    
 /* ----------------------Preliminary Declarations Section--------------------*/
    
