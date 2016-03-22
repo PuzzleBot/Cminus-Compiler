@@ -99,6 +99,7 @@ public class SemanticHashmap{
     
     /*Print all identifiers local to the current scope*/
     public void printInnerScope(){
+        System.out.println("variables inside this scope:");
         Iterator<Map.Entry<String, Identifier>> scopeIterator = hashMapList.peek().entrySet().iterator();
         Map.Entry<String, Identifier> currentEntry;
         Identifier currentIdentifier;
@@ -115,6 +116,7 @@ public class SemanticHashmap{
             }
             System.out.println(currentIdentifier.toString());
         }
+        System.out.println("leaving scope");
     }
     
     /*Test main*/

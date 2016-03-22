@@ -22,6 +22,7 @@ class Main {
         boolean genCodeFlag = false;
         int i;
         
+        
         for(i = 0; i < argv.length; i++){
             if(argv[i].equals("-a")){
                 showTreeFlag = true;
