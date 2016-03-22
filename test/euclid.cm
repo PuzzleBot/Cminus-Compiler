@@ -1,6 +1,10 @@
 /* A program that uses Euclid’s algorithm to 
 compute gcd */
 
+
+int global;
+
+
 int stuff (int de){
     int x[8];
     x[1] = 8 + 9;
