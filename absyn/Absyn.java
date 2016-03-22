@@ -74,9 +74,8 @@ abstract public class Absyn {
     }
 
     static private void showTree( AssignExp tree, int spaces ) {
-        indent( spaces );
-        
         if(showAST==true){
+            indent( spaces );
             System.out.println( "AssignExp:" );
         }
         spaces += SPACES;
@@ -85,8 +84,8 @@ abstract public class Absyn {
     }
 
     static private void showTree( IfExp tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "IfExp:" );
         }
         spaces += SPACES;
@@ -98,15 +97,15 @@ abstract public class Absyn {
     }
 
     static private void showTree( IntExp tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
-           System.out.println( "IntExp: " + tree.value ); 
+            indent( spaces );
+            System.out.println( "IntExp: " + tree.value );
         }
     }
 
     static private void showTree( OpExp tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.print( "OpExp:" );
  
             switch( tree.op ) {
@@ -147,16 +146,16 @@ abstract public class Absyn {
     }
 
     static private void showTree( ReadExp tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "ReadExp:" );
         }
         showTree( tree.input, spaces + SPACES );  
     }
     
     static private void showTree( Dec tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "Dec:" );
         }
         if (tree!=null){
@@ -171,8 +170,8 @@ abstract public class Absyn {
     }
 
     static private void showTree( RepeatExp tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "RepeatExp:" );
         }
         spaces += SPACES;
@@ -181,23 +180,23 @@ abstract public class Absyn {
     }
 
     static private void showTree( VarExp tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "VarExp: ");
         }
         showTree( tree.name, spaces );
     }
     
     static private void showTree( NilExp tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "NilExp:" );
         }
     }
     
     static private void showTree( CallExp tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "CallExp: " +tree.func );
         }
         showTree( tree.args, spaces + SPACES );
@@ -206,8 +205,8 @@ abstract public class Absyn {
     
     
     static private void showTree( WhileExp tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "WhileExp:" );
         }
         showTree( tree.test, spaces + SPACES ); 
@@ -215,17 +214,16 @@ abstract public class Absyn {
     }
     
     static private void showTree( ReturnExp tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "ReturnExp:" );
         }
         showTree( tree.exp, spaces + SPACES ); 
     }
     
     static private void showTree( CompoundExp tree, int spaces ) {
-        indent( spaces );
-        
         if(showAST==true){
+            indent( spaces );
             System.out.println( "CompoundExp:" );
         }
         
@@ -244,8 +242,8 @@ abstract public class Absyn {
     
     static private void showTree( VarDecList tree, int spaces ) {
         if(tree!=null){
-            indent( spaces );
             if(showAST==true){
+                indent( spaces );
                 System.out.println( "VarDecList:" );
             }
             showTree( tree.head, spaces + SPACES ); 
@@ -254,17 +252,17 @@ abstract public class Absyn {
     }
     
     static private void showTree( SimpleDec tree, int spaces ) {
-        indent( spaces );
         theMap.insertIdentifier(new Identifier(tree.name,Identifier.INT));
         if(showAST==true){
+            indent( spaces );
             System.out.println( "SimpleDec: " + tree.name );
         }
         showTree( tree.typ, spaces + SPACES );
     }
     
     static private void showTree( ArrayDec tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "ArrayDec: " + tree.name );
         }
         theMap.insertIdentifier(new Identifier(tree.name,Identifier.INT_ARRAY));
@@ -288,15 +286,15 @@ abstract public class Absyn {
     }
     
     static private void showTree( FunctionDec tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "FunctionDec: " +tree.func );
         }
         
         
         if (tree!=null){
-        
             if(showMap==true){
+                indent( spaces );
                 System.out.println("entering new scope");
             }
             theMap.newInnerScope();
@@ -311,22 +309,22 @@ abstract public class Absyn {
         }
     }
     static private void showTree( SimpleVar tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "Variable: " +tree.name );
         }
     }
     static private void showTree( IndexVar tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             System.out.println( "indexed Variable: " +tree.name );
         }
         showTree(tree.index,spaces);
     }
     
     static private void showTree( NameTy tree, int spaces ) {
-        indent( spaces );
         if(showAST==true){
+            indent( spaces );
             switch(tree.typ){
                 case NameTy.INT:
                     System.out.println( "NameType: INT");

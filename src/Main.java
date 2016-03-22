@@ -28,7 +28,7 @@ class Main {
                 showTreeFlag = true;
             }
             
-            if(argv[i].equals("-e")){
+            if(argv[i].equals("-s")){
                 showTableFlag = true;
             }
             
