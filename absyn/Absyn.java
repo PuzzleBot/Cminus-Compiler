@@ -1,10 +1,13 @@
 package absyn;
-
+import symtable.*;
 abstract public class Absyn {
     public int pos;
 
     final static int SPACES = 4;
-
+    public static SemanticHashmap theMap;
+    public static boolean showMap = true;
+    
+    
     static private void indent( int spaces ) {
         for( int i = 0; i < spaces; i++ ) System.out.print( " " );
     }
@@ -19,8 +22,14 @@ abstract public class Absyn {
     static public void showTree( DecList tree, int spaces ) {
         
         while( tree != null ) {
+            theMap=new SemanticHashmap();
+            
             showTree( tree.head, spaces );
             tree = tree.tail;
+            
+            if(showMap==true){
+               // theMap.printInnerScope();
+            }
         }
     }
 
@@ -188,8 +197,16 @@ abstract public class Absyn {
     static private void showTree( CompoundExp tree, int spaces ) {
         indent( spaces );
         System.out.println( "CompoundExp:" );
+        theMap.newInnerScope();
+        
         showTree( tree.decs, spaces + SPACES ); 
         showTree( tree.exps, spaces + SPACES ); 
+        if(showMap==true){
+            System.out.println("variables in this scope:");
+            theMap.printInnerScope();
+            System.out.println("leaving inner scope");
+        }
+        theMap.deleteInnerScope();
     }
     
     static private void showTree( VarDecList tree, int spaces ) {
@@ -203,6 +220,7 @@ abstract public class Absyn {
     
     static private void showTree( SimpleDec tree, int spaces ) {
         indent( spaces );
+        theMap.insertIdentifier(new Identifier(tree.name,Identifier.INT));
         System.out.println( "SimpleDec: " + tree.name );
         showTree( tree.typ, spaces + SPACES );
     }
@@ -210,6 +228,7 @@ abstract public class Absyn {
     static private void showTree( ArrayDec tree, int spaces ) {
         indent( spaces );
         System.out.println( "ArrayDec: " + tree.name );
+        theMap.insertIdentifier(new Identifier(tree.name,Identifier.INT_ARRAY));
         showTree( tree.typ, spaces + SPACES );
         showTree( tree.size, spaces + SPACES ); 
     }
