@@ -13,6 +13,7 @@
 
 import java.io.*;
 import absyn.*;
+import symtable.*;
 
 class Main {
     static public void main(String argv[]) {

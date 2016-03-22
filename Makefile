@@ -3,15 +3,16 @@ JAVAC=javac
 JFLEX=jflex
 FILE=test/euclid.cm
 CLASSPATH=-classpath /usr/share/java/cup.jar:./cup/java-cup-11.jar:.:
+RUNCLASSPATH=-classpath /usr/share/java/cup.jar:.:./bin/:./absyn/:./symtable/
 CUP=$(JAVA) $(CLASSPATH) java_cup.Main -expect 3 <
 #CUP=cup
 
 all: Main.class
 
-Main.class: absyn/*.java bin/parser.java bin/sym.java bin/lexer.java allClasses 
+Main.class: absyn/*.java symtable/*.java bin/parser.java bin/sym.java bin/lexer.java allClasses 
 
 allClasses:
-	$(JAVAC) $(CLASSPATH) absyn/*.java src/*.java bin/*.java
+	$(JAVAC) $(CLASSPATH) absyn/*.java symtable/*.java src/*.java bin/*.java
 	mv src/*.class ./bin/
 
 bin/lexer.java: src/cminus.flex
@@ -27,11 +28,11 @@ bin/parser.java: src/cminus.cup
 
 
 clean:
-	rm -f bin/parser.java bin/lexer.java bin/sym.java *.class bin/*.class bin/*.java absyn/*.class *~
+	rm -f bin/parser.java bin/lexer.java bin/sym.java *.class bin/*.class bin/*.java absyn/*.class *~ symtable/*.class
 
 run:
-	java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ Main $(FILE) -a -e -c
+	java $(RUNCLASSPATH) Main $(FILE) -a -e -c
 
 
 testSymTable:
-	java -classpath /usr/share/java/cup.jar:.:./bin/:./absyn/ SemanticHashmap
+	java $(RUNCLASSPATH) symtable/SemanticHashmap

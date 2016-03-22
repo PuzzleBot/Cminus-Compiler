@@ -1,3 +1,5 @@
+package symtable;
+
 import absyn.*;
 import java.util.*;
 
