@@ -1,5 +1,6 @@
 package absyn;
 import symtable.*;
+import java.util.*;
 abstract public class Absyn {
     public int pos;
 
@@ -7,6 +8,7 @@ abstract public class Absyn {
     public static SemanticHashmap theMap;
     public static boolean showMap = true;
     public static boolean showAST = true;
+    public static ArrayList <Identifier> theList;
     
     static private void indent( int spaces ) {
         for( int i = 0; i < spaces; i++ ) System.out.print( " " );
@@ -199,6 +201,8 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "CallExp: " +tree.func );
         }
+        
+        
         showTree( tree.args, spaces + SPACES );
         
     }
@@ -232,6 +236,7 @@ abstract public class Absyn {
         }
             theMap.newInnerScope();
         
+        
         showTree( tree.decs, spaces + SPACES ); 
         showTree( tree.exps, spaces + SPACES ); 
         if(showMap==true){
@@ -246,6 +251,9 @@ abstract public class Absyn {
                 indent( spaces );
                 System.out.println( "VarDecList:" );
             }
+            if(tree.head!=null){
+                theList.add(new Identifier(tree.head.name,tree.head.typ.typ));
+            }
             showTree( tree.head, spaces + SPACES ); 
             showTree( tree.tail, spaces + SPACES ); 
         }
@@ -258,6 +266,7 @@ abstract public class Absyn {
             System.out.println( "SimpleDec: " + tree.name );
         }
         showTree( tree.typ, spaces + SPACES );
+            
     }
     
     static private void showTree( ArrayDec tree, int spaces ) {
@@ -275,6 +284,8 @@ abstract public class Absyn {
             showTree((SimpleDec)tree, spaces);
         else if( tree instanceof ArrayDec )
             showTree((ArrayDec)tree, spaces);
+            
+            
     }
    
     static private void showTree( Var tree, int spaces ) {
@@ -292,15 +303,46 @@ abstract public class Absyn {
         }
         
         
+        
         if (tree!=null){
             if(showMap==true){
                 indent( spaces );
                 System.out.println("entering new scope");
             }
+            
+            
+            
             theMap.newInnerScope();
-        
+      
             showTree( tree.result, spaces + SPACES );
+            
+            
+            
+            theList=new ArrayList<Identifier>();
             showTree( tree.params, spaces + SPACES );
+             FunctionIdentifier thisFunction;
+             
+             
+            if(tree.result.typ==NameTy.VOID){
+               thisFunction=new FunctionIdentifier(tree.func,FunctionIdentifier.FUNCTION_VOID);
+                
+                for(int i=0;i<theList.size();i++){
+                    thisFunction.addToArgs(theList.get(i));
+                }
+                
+                
+            }
+            
+            else{
+            thisFunction=new FunctionIdentifier(tree.func,FunctionIdentifier.FUNCTION_INT);
+                for(int i=0;i<theList.size();i++){
+                    thisFunction.addToArgs(theList.get(i));
+                }
+                
+            }
+            theMap.insertIdentifier(thisFunction);
+            
+
             showTree( tree.body, spaces + SPACES );
             if(showMap==true){
                 theMap.printInnerScope();
