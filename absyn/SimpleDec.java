@@ -6,7 +6,5 @@ public class SimpleDec extends VarDec{
         this.pos=pos;
         this.name=name;
         this.typ=typ;
-        
-        System.out.println("Storing name: " + this.name);
     }
 }
