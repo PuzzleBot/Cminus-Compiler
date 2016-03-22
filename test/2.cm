@@ -1,5 +1,5 @@
 /* A program that uses Euclid’s algorithm to 
-compute gcd (missing one semicolon)*/
+compute gcd (missing one argument to gcd on call)*/
 
 int gcd (int u, int v ) {
     if (v == 0) 
@@ -10,8 +10,8 @@ int gcd (int u, int v ) {
 
 void main (void) {
     int x;
-    int y
+    int y;
     x = input(); 
     y = input();
-    output( gcd(x, y) );
+    output( gcd(x) );
 }

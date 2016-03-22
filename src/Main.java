@@ -44,10 +44,14 @@ class Main {
             /*Result is usually DecList*/
             Object result = p.parse().value;
             
+            Absyn.showAST = showTreeFlag;
+            Absyn.showMap = showTableFlag;
+            
             if(showTreeFlag == true){
                 System.out.println( "The abstract syntax tree is:" );
-                Absyn.showTree( (DecList)result, 0 );
             }
+            Absyn.showTree( (DecList)result, 0 );
+
         } catch (Exception e) {
             /* do cleanup here -- possibly rethrow e */
             e.printStackTrace();

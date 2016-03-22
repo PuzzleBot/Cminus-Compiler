@@ -1,7 +1,7 @@
 /* A program that uses Euclid’s algorithm to 
 compute gcd (Bad function call)*/
 
-int gcd (int u, int v ) {
+int addToAll (int u, int v ) {
     if (v == 0) 
         return u;
     else
@@ -9,9 +9,9 @@ int gcd (int u, int v ) {
 }
 
 void main (void) {
-    int x;
+    int x[5];
     int y;
-    x = input(x ==== 5); 
+    x = input(); 
     y = input();
     output( gcd(x, y) );
 }
