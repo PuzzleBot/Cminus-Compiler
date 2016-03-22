@@ -31,7 +31,16 @@ clean:
 	rm -f bin/parser.java bin/lexer.java bin/sym.java *.class bin/*.class bin/*.java absyn/*.class *~ symtable/*.class
 
 run:
-	java $(RUNCLASSPATH) Main $(FILE) -a -e -c
+	java $(RUNCLASSPATH) Main $(FILE) -a -s -c
+
+runAST:
+	java $(RUNCLASSPATH) Main $(FILE) -a
+
+runTable:
+	java $(RUNCLASSPATH) Main $(FILE) -s
+
+runCodegen:
+	java $(RUNCLASSPATH) Main $(FILE) -c
 
 
 testSymTable:
