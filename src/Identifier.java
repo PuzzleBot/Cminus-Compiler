@@ -2,6 +2,7 @@ import absyn.*;
 import java.util.*;
 
 public class Identifier{
+    public static final int VOID = 0;
     public static final int INT = 1;
     public static final int INT_ARRAY = 2;
     
@@ -26,7 +27,9 @@ public class Identifier{
             case INT:
                 return "int " + name;
             case INT_ARRAY:
-                return "int array" + name;
+                return "int array " + name;
+            case VOID:
+                return "void " + name;
             default:
                 return "Error!";
         }

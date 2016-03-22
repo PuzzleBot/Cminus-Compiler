@@ -33,6 +33,51 @@ public class SemanticHashmap{
         return null;
     }
     
+    public boolean typeCheck(String identifierName, int type){
+        /*Type may only be Identifier.INT, Identifier.INT_ARRAY or Identifier.VOID*/
+        Identifier theIdentifier = this.lookup(identifierName);
+        
+        if(theIdentifier.getType() == type){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
+    public boolean functionArgCheck(String identifierName, ArrayList<Integer> argTypes){
+        /*argTypes is an arraylist of integers containing the types of the given arguments,
+          in order*/
+        Identifier theIdentifier = this.lookup(identifierName);
+        
+        if(theIdentifier instanceof FunctionIdentifier){
+            FunctionIdentifier theFunction = (FunctionIdentifier)theIdentifier;
+            ArrayList<Identifier> functionArgs = theFunction.getArgList();
+            
+            if(functionArgs.size() != argTypes.size()){
+                /*Mismatching number of args test*/
+                return false;
+            }
+            else{
+                int i;
+                int numberOfArgs = argTypes.size();
+                
+                for(i = 0; i < numberOfArgs; i++){
+                    /*Mismatching type test*/
+                    if(functionArgs.get(i).getType() != argTypes.get(i)){
+                        return false;
+                    }
+                }
+            }
+        }
+        else{
+            return false;
+        }
+        
+        /*Pass all type comparisons - accept*/
+        return true;
+    }
+    
     public void newInnerScope(){
         hashMapList.push(new HashMap<String, Identifier>());
     }
@@ -48,11 +93,6 @@ public class SemanticHashmap{
         int scopeDepth = hashMapList.size();
         
         int i;
-        
-        for(i = 0; i < scopeDepth; i++){
-            System.out.print("    ");
-        }
-        System.out.println("--Identifiers: Variable scope depth " + scopeDepth + " --");
         
         while(scopeIterator.hasNext() == true){
             currentEntry = scopeIterator.next();
@@ -93,6 +133,22 @@ public class SemanticHashmap{
         }
         else{
             System.out.println("globalY is accessible! (fail)");
+        }
+        
+        boolean isInt = symbolTable.typeCheck("globalX", Identifier.INT);
+        if(isInt == true){
+            System.out.println("globalX is an int! (pass)");
+        }
+        else{
+            System.out.println("globalX is not an int! (fail)");
+        }
+        
+        boolean isVoid = symbolTable.typeCheck("globalX", Identifier.VOID);
+        if(isVoid == true){
+            System.out.println("globalX is a void! (fail)");
+        }
+        else{
+            System.out.println("globalX is not a void! (pass)");
         }
         
         symbolTable.printInnerScope();
