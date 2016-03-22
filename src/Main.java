@@ -1,14 +1,10 @@
 /*
- Created by: Fei Song
- File Name: Main.java
- To Build:
- After the scanner, tiny.flex, and the parser, tiny.cup, have been created.
- javac Main.java
+ Created by: 
+    Brandon Tan
+    George Chapman-Brown
  
- To Run:
- java -classpath /usr/share/java/cup.jar:. Main gcd.tiny
- 
- where gcd.tiny is an test input file for the tiny language.
+ Main.java
+ - Main driver class for the Cminus compiler
  */
 
 import java.io.*;

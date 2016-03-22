@@ -1,12 +1,12 @@
 /*
-  Created By: Fei Song
-  File Name: tiny.flex
-  To Build: jflex tiny.flex
+Created by:
+    Brandon Tan
+    George Chapman-Brown
 
-  and then after the parser is created
-    javac Lexer.java
+cminus.flex
+- Scanner component
 */
-   
+
 /* --------------------------Usercode Section------------------------ */
    
 import java_cup.runtime.*;
