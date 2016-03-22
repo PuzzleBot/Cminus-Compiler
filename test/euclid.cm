@@ -12,7 +12,7 @@ void notFun(void){
 	return;
 }
 
-int gcd ( int v ) {
+int gcd ( int v, int u ) {
     if (v == 0) 
         return u;
     else
