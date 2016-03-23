@@ -336,19 +336,19 @@ abstract public class Absyn {
         int returnType = showTree( tree.exp, spaces + SPACES );
         int functionReturnType;
         
-        switch(currentFuncIdentifier.getType()){
-            case FunctionIdentifier.FUNCTION_INT:
-                functionReturnType = Identifier.INT;
-                break;
-            case FunctionIdentifier.FUNCTION_VOID:
-                functionReturnType = Identifier.VOID;
-                break;
-            default:
-                functionReturnType = Identifier.VOID;
-                break;
-        }
-        
         if(currentFuncIdentifier != null){
+            switch(currentFuncIdentifier.getType()){
+                case FunctionIdentifier.FUNCTION_INT:
+                    functionReturnType = Identifier.INT;
+                    break;
+                case FunctionIdentifier.FUNCTION_VOID:
+                    functionReturnType = Identifier.VOID;
+                    break;
+                default:
+                    functionReturnType = Identifier.VOID;
+                    break;
+            }
+            
             if(functionReturnType != returnType){
                 System.out.println("Error: Returning value of type " + Identifier.typeToString(returnType) + " for function with type " + Identifier.typeToString(currentFuncIdentifier.getType()) + ": line " + tree.pos);
                 hasError = true;
@@ -529,6 +529,7 @@ abstract public class Absyn {
         if(searchResult==null){
             System.out.println("Error: variable "+tree.name+" not declared: line " + tree.pos);
             hasError = true;
+            return Identifier.VOID;
         }
         else if(searchResult.getType()==Identifier.INT_ARRAY){
             System.out.println("Error: variable "+tree.name+" is an array type, not a simple variable: line " + tree.pos);
