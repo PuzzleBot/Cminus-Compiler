@@ -11,6 +11,7 @@ abstract public class Absyn {
     public static ArrayList <Identifier> theList;
     public static Identifier searchResult;
     public static String previousScopeName = "noScope";
+    public static int type;
     
     static private void indent( int spaces ) {
         for( int i = 0; i < spaces; i++ ) System.out.print( " " );
@@ -151,7 +152,14 @@ abstract public class Absyn {
                     System.out.println( "Unrecognized operator at line " + tree.pos);
             }
         }
+        
+        
         spaces += SPACES;
+        
+        //typechecking for 2 sides of operand
+        Identifier sideA;
+        Identifier sideB;
+        
         showTree( tree.left, spaces );
         showTree( tree.right, spaces ); 
     }
@@ -214,6 +222,9 @@ abstract public class Absyn {
             System.out.println( "CallExp: " +tree.func );
         }
         
+        //check function here
+        
+        
         
         showTree( tree.args, spaces + SPACES );
         
@@ -234,6 +245,9 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "ReturnExp:" );
         }
+        
+        
+        //check for function return match
         showTree( tree.exp, spaces + SPACES ); 
     }
     
@@ -385,10 +399,13 @@ abstract public class Absyn {
         }
         //run the type test for variable showtree
         searchResult=theMap.lookup(tree.name);
+        
         if(searchResult==null){
             System.out.println("variable "+tree.name+" not declared");
         }
-        
+        else if(searchResult.getType()==Identifier.INT_ARRAY){
+            System.out.println("variable "+tree.name+" is an array type, not a simple variable");
+        }
         
         
     }
