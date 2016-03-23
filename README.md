@@ -18,9 +18,9 @@ depending on flags given.
 Alternatively, the following commands will run the program with the file
 test/euclid.cm:
 
-    make run          (both -a and -s)
-    make runAST       (-a only)
-    make runTable     (-s only)
+    make run FILE=<filename>          (both -a and -s)
+    make runAST FILE=<filename>       (-a only)
+    make runTable FILE=<filename>     (-s only)
 
 
 To rebuild the parser, type "make clean" and type "make" again.
