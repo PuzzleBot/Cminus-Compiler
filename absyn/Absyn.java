@@ -10,6 +10,8 @@ abstract public class Absyn {
     public static boolean showAST = true;
     public static ArrayList <Identifier> theList;
     
+    public static String previousScopeName = "noScope";
+    
     static private void indent( int spaces ) {
         for( int i = 0; i < spaces; i++ ) System.out.print( " " );
     }
@@ -90,10 +92,13 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "IfExp:" );
         }
+        previousScopeName = "if";
+        
         spaces += SPACES;
         showTree( tree.test, spaces );
         showTree( tree.thenpart, spaces );
         if(tree.elsepart!=null){
+            previousScopeName = "else";
             showTree( tree.elsepart, spaces );
         }
     }
@@ -232,9 +237,9 @@ abstract public class Absyn {
         }
         
         if(showMap==true){
-            System.out.println("entering new scope");
+            //System.out.println("entering new scope");
         }
-            theMap.newInnerScope();
+            theMap.newInnerScope(previousScopeName);
         
         
         showTree( tree.decs, spaces + SPACES ); 
@@ -302,17 +307,17 @@ abstract public class Absyn {
             System.out.println( "FunctionDec: " +tree.func );
         }
         
-        
+        previousScopeName = tree.func;
         
         if (tree!=null){
             if(showMap==true){
                 indent( spaces );
-                System.out.println("entering new scope");
+                //System.out.println("entering new scope");
             }
             
             
             
-            theMap.newInnerScope();
+            theMap.newInnerScope(previousScopeName);
       
             showTree( tree.result, spaces + SPACES );
             

@@ -1,16 +1,19 @@
-/* A program that uses Euclid’s algorithm to 
-compute gcd (no errors)*/
+/*Example code from checkpoint 2 evaluation*/
 
-int gcd (int u, int v ) {
-    if (v == 0) 
-        return u;
-    else
-        return gcd(v, u - u / v * v);  /* u-u/v*v == u mod v */
+void main(void){
+	int a[2]; int x; int y;
+	a[x] = 1;
+	a[y] = 2;
 }
 
-void main (void) {
-    int x;
-    int y;
-    x = input(); 
-    y = input();
+int fun1(int fff){
+	int x; int y; int z;
+	x = x * 2 + 1
+	y = x + z;
+}
+
+void fun2(void){
+	int x;
+	x = 2
+	return x;
 }

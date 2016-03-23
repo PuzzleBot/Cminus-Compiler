@@ -2,7 +2,7 @@
 compute gcd */
 
 
-int global;
+int globalVar;
 
 
 int stuff (int de){

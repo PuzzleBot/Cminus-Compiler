@@ -5,14 +5,22 @@ import java.util.*;
 
 public class SemanticHashmap{
     public Stack<HashMap<String, Identifier>> hashMapList;
+    public Stack<String> scopeNames;
 
-    /*Constructor for a new syntax table. Automatically declares input() and output().*/
+    /*Constructor for a new syntax table. Automatically declares int input() and void output(int x).*/
     public SemanticHashmap(){
         hashMapList = new Stack<HashMap<String, Identifier>>();
         hashMapList.push(new HashMap<String, Identifier>());
         
-        this.insertIdentifier(new FunctionIdentifier("input", FunctionIdentifier.FUNCTION_VOID));
-        this.insertIdentifier(new FunctionIdentifier("output", FunctionIdentifier.FUNCTION_VOID));
+        scopeNames = new Stack<String>();
+        scopeNames.push("Global");
+        
+        FunctionIdentifier inputIdentifier = new FunctionIdentifier("input", FunctionIdentifier.FUNCTION_INT);
+        FunctionIdentifier outputIdentifier = new FunctionIdentifier("output", FunctionIdentifier.FUNCTION_VOID);
+        outputIdentifier.addToArgs(new Identifier("x", Identifier.INT));
+        
+        this.insertIdentifier(inputIdentifier);
+        this.insertIdentifier(outputIdentifier);
     }
     
     /*Insert (declare) a new identifier in the symbol table, with its type.*/
@@ -88,24 +96,31 @@ public class SemanticHashmap{
     }
     
     /*Create a new scope inside the current scope*/
-    public void newInnerScope(){
+    public void newInnerScope(String scopeName){
         hashMapList.push(new HashMap<String, Identifier>());
+        scopeNames.push(scopeName);
     }
     
     /*Exit the innermost scope*/
     public void deleteInnerScope(){
         HashMap<String, Identifier> deletedScope = hashMapList.pop();
+        String deletedScopeName = scopeNames.pop();
     }
     
     /*Print all identifiers local to the current scope*/
     public void printInnerScope(){
-        System.out.println("variables inside this scope:");
         Iterator<Map.Entry<String, Identifier>> scopeIterator = hashMapList.peek().entrySet().iterator();
         Map.Entry<String, Identifier> currentEntry;
         Identifier currentIdentifier;
         int scopeDepth = hashMapList.size();
         
         int i;
+        
+        
+        for(i = 0; i < scopeDepth; i++){
+            System.out.print("    ");
+        }
+        System.out.println("Variables inside \"" + scopeNames.peek() + "\":");
         
         while(scopeIterator.hasNext() == true){
             currentEntry = scopeIterator.next();
@@ -114,9 +129,13 @@ public class SemanticHashmap{
             for(i = 0; i < scopeDepth; i++){
                 System.out.print("    ");
             }
-            System.out.println(currentIdentifier.toString());
+            System.out.println("  " + currentIdentifier.toString());
         }
-        System.out.println("leaving scope");
+        
+        for(i = 0; i < scopeDepth; i++){
+            System.out.print("    ");
+        }
+        System.out.println("Leaving \"" + scopeNames.peek() + "\"");
     }
     
     /*Test main*/
@@ -129,7 +148,7 @@ public class SemanticHashmap{
         symbolTable.insertIdentifier(gcdIdentifier);
         symbolTable.insertIdentifier(new Identifier("globalX", Identifier.INT));
         
-        symbolTable.newInnerScope();
+        symbolTable.newInnerScope("gcd");
         symbolTable.insertIdentifier(new Identifier("varX", Identifier.INT));
         symbolTable.insertIdentifier(new Identifier("varY", Identifier.INT));
         
