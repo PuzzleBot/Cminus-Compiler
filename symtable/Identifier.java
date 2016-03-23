@@ -38,4 +38,17 @@ public class Identifier{
                 return "Error!";
         }
     }
+    
+    public static String typeToString(int type){
+        switch(type){
+            case VOID:
+                return "VOID";
+            case INT:
+                return "INT";
+            case INT_ARRAY:
+                return "INT ARRAY";
+            default:
+                return "UNKNOWN";
+        }
+    }
 }

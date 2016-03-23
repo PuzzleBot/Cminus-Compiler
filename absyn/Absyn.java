@@ -13,6 +13,7 @@ abstract public class Absyn {
     public static ArrayList <Identifier> theList;
     public static Identifier searchResult;
     public static String previousScopeName = "noScope";
+    public static String currentFunction = "global";
     public static int type;
     
     public static boolean hasError = false;
@@ -47,62 +48,78 @@ abstract public class Absyn {
         }
     }
 
-    static private void showTree( Exp tree, int spaces ) {
+    /*All exp nodes pass the "type" of the exp back up*/
+    static private int showTree( Exp tree, int spaces ) {
+        int expressionType = Identifier.VOID;
+        
         if(tree!=null){
             /*All of these return Identifier types*/
             if( tree instanceof AssignExp )
                 /*Returns type which should be on both sides*/
-                showTree( (AssignExp)tree, spaces );
+                expressionType = showTree( (AssignExp)tree, spaces );
             else if( tree instanceof IfExp )
                 /*Returns INT*/
-                showTree( (IfExp)tree, spaces );
+                expressionType = showTree( (IfExp)tree, spaces );
             else if( tree instanceof IntExp )
                 /*Returns INT*/
-                showTree( (IntExp)tree, spaces );
+                expressionType = showTree( (IntExp)tree, spaces );
             else if( tree instanceof OpExp )
                 /*Returns type which should be on both sides*/
-                showTree( (OpExp)tree, spaces );
+                expressionType = showTree( (OpExp)tree, spaces );
             else if( tree instanceof VarExp )
                 /*Returns type of variable*/
-                showTree( (VarExp)tree, spaces );
+                expressionType = showTree( (VarExp)tree, spaces );
             else if( tree instanceof NilExp )
                 /*Returns VOID*/
                 showTree( (NilExp)tree, spaces );
             else if( tree instanceof CallExp )
                 /*Returns the return type of the called function*/
-                showTree( (CallExp)tree, spaces );
+                expressionType = showTree( (CallExp)tree, spaces );
             else if( tree instanceof WhileExp )
                 /*Returns VOID*/
                 showTree( (WhileExp)tree, spaces );
             else if( tree instanceof ReturnExp )
                 /*Returns type of the thing returned*/
-                showTree( (ReturnExp)tree, spaces );
+                expressionType = showTree( (ReturnExp)tree, spaces );
             else if( tree instanceof CompoundExp )
                 /*Returns VOID*/
                 showTree( (CompoundExp)tree, spaces, true );
     
             else {
                 indent( spaces );
-                System.out.println( "Illegal expression at line " + tree.pos);
+                System.out.println( "Error: Illegal expression at line " + tree.pos);
+                hasError = true;
             }
         }else{
             if(showAST==true){
                 System.out.println("null expression");
             }
         }
+        
+        return expressionType;
     }
 
-    static private void showTree( AssignExp tree, int spaces ) {
+    static private int showTree( AssignExp tree, int spaces ) {
+        int leftType;
+        int rightType;
+        
         if(showAST==true){
             indent( spaces );
             System.out.println( "AssignExp:" );
         }
         spaces += SPACES;
-        showTree( tree.lhs, spaces );
-        showTree( tree.rhs, spaces );
+        leftType = showTree( tree.lhs, spaces );
+        rightType = showTree( tree.rhs, spaces );
+        
+        if(leftType != rightType){
+            System.out.println("Error: Assigning value of type " + Identifier.typeToString(rightType) + " to variable of type " + Identifier.typeToString(leftType) + ": line " + tree.pos);
+            hasError = true;
+        }
+        
+        return leftType;
     }
 
-    static private void showTree( IfExp tree, int spaces ) {
+    static private int showTree( IfExp tree, int spaces ) {
         if(showAST==true){
             indent( spaces );
             System.out.println( "IfExp:" );
@@ -116,16 +133,23 @@ abstract public class Absyn {
             previousScopeName = "else";
             showTree( tree.elsepart, spaces );
         }
+        
+        return Identifier.INT;
     }
 
-    static private void showTree( IntExp tree, int spaces ) {
+    static private int showTree( IntExp tree, int spaces ) {
         if(showAST==true){
             indent( spaces );
             System.out.println( "IntExp: " + tree.value );
         }
+        
+        return Identifier.INT;
     }
 
-    static private void showTree( OpExp tree, int spaces ) {
+    static private int showTree( OpExp tree, int spaces ) {
+        int leftType;
+        int rightType;
+        
         if(showAST==true){
             indent( spaces );
             System.out.print( "OpExp:" );
@@ -159,7 +183,8 @@ abstract public class Absyn {
                     System.out.println( " != " );
                     break;
                 default:
-                    System.out.println( "Unrecognized operator at line " + tree.pos);
+                    System.out.println( "Error: Unrecognized operator at line " + tree.pos);
+                    hasError = true;
             }
         }
         
@@ -170,8 +195,15 @@ abstract public class Absyn {
         Identifier sideA;
         Identifier sideB;
         
-        showTree( tree.left, spaces );
-        showTree( tree.right, spaces ); 
+        leftType = showTree( tree.left, spaces );
+        rightType = showTree( tree.right, spaces );
+        
+        if(leftType != rightType){
+            System.out.println("Error: Value of type " + Identifier.typeToString(rightType) + " used with incompatible type " + Identifier.typeToString(leftType) + ": line " + tree.pos);
+            hasError = true;
+        }
+        
+        return leftType;
     }
     
     static private void showTree( Dec tree, int spaces ) {
@@ -190,15 +222,13 @@ abstract public class Absyn {
         }
     }
 
-    static private void showTree( VarExp tree, int spaces ) {
+    static private int showTree( VarExp tree, int spaces ) {
         if(showAST==true){
             indent( spaces );
             System.out.println( "VarExp: ");
         }
         
-        
-        
-        showTree( tree.name, spaces );
+        return showTree( tree.name, spaces );
     }
     
     static private void showTree( NilExp tree, int spaces ) {
@@ -208,18 +238,26 @@ abstract public class Absyn {
         }
     }
     
-    static private void showTree( CallExp tree, int spaces ) {
+    static private int showTree( CallExp tree, int spaces ) {
         if(showAST==true){
             indent( spaces );
             System.out.println( "CallExp: " +tree.func );
         }
         
-        //check function here
-        
-        
-        
         showTree( tree.args, spaces + SPACES );
         
+        Identifier currentFuncIdentifier = theMap.lookup(tree.func);
+        
+        if(currentFuncIdentifier == null){
+            System.out.println("Error: Calling undefined function " + tree.func + ": line " + tree.pos);
+            hasError = true;
+            
+            return Identifier.VOID;
+        }
+        else{
+            //check function call parameters here
+            return currentFuncIdentifier.getType();
+        }
     }
     
     
@@ -232,15 +270,24 @@ abstract public class Absyn {
         showTree( tree.body, spaces + SPACES ); 
     }
     
-    static private void showTree( ReturnExp tree, int spaces ) {
+    static private int showTree( ReturnExp tree, int spaces ) {
         if(showAST==true){
             indent( spaces );
             System.out.println( "ReturnExp:" );
         }
         
-        
         //check for function return match
-        showTree( tree.exp, spaces + SPACES ); 
+        Identifier currentFuncIdentifier = theMap.lookup(currentFunction);
+        int returnType = showTree( tree.exp, spaces + SPACES );
+        
+        if(currentFuncIdentifier != null){
+            if(currentFuncIdentifier.getType() != returnType){
+                System.out.println("Error: Returning value of type " + Identifier.typeToString(returnType) + " for function with type " + Identifier.typeToString(currentFuncIdentifier.getType()) + ": line " + tree.pos);
+                hasError = true;
+            }
+        }
+        
+        return returnType;
     }
     
     static private void showTree( CompoundExp tree, int spaces , boolean createNewScope) {
@@ -316,7 +363,14 @@ abstract public class Absyn {
         }
         theMap.insertIdentifier(new Identifier(tree.name,Identifier.INT_ARRAY));
         showTree( tree.typ, spaces + SPACES );
-        showTree( tree.size, spaces + SPACES ); 
+        
+        int arraySizeType = showTree( tree.size, spaces + SPACES );
+        
+        if(arraySizeType != Identifier.INT){
+            System.out.println("Error: Setting array size to non-integer: line " + tree.pos);
+            hasError = true;
+        }
+        
     }
     
     static private void showTree( VarDec tree, int spaces ) {
@@ -328,11 +382,13 @@ abstract public class Absyn {
             
     }
    
-    static private void showTree( Var tree, int spaces ) {
+    static private int showTree( Var tree, int spaces ) {
         if( tree instanceof SimpleVar )
-            showTree((SimpleVar)tree,spaces);
+            return showTree((SimpleVar)tree,spaces);
         else if( tree instanceof IndexVar )
-            showTree((IndexVar)tree,spaces);
+            return showTree((IndexVar)tree,spaces);
+        
+        return Identifier.VOID;
         
     }
     
@@ -343,6 +399,7 @@ abstract public class Absyn {
         }
         
         previousScopeName = tree.func;
+        currentFunction = tree.func;
         
         if (tree!=null){
             if(showMap==true){
@@ -375,16 +432,15 @@ abstract public class Absyn {
                 
             }
             
-
+            theMap.insertIdentifier(thisFunction);
             showTree( (CompoundExp)tree.body, spaces + SPACES, false );
             if(showMap==true){
                 //theMap.printInnerScope();
             }
             theMap.deleteInnerScope();
-            theMap.insertIdentifier(thisFunction);
         }
     }
-    static private void showTree( SimpleVar tree, int spaces ) {
+    static private int showTree( SimpleVar tree, int spaces ) {
         if(showAST==true){
             indent( spaces );
             System.out.println( "Variable: " +tree.name );
@@ -393,20 +449,21 @@ abstract public class Absyn {
         searchResult=theMap.lookup(tree.name);
         
         if(searchResult==null){
-            System.out.println("Error: variable "+tree.name+" not declared");
+            System.out.println("Error: variable "+tree.name+" not declared: line " + tree.pos);
             hasError = true;
         }
         else if(searchResult.getType()==Identifier.INT_ARRAY){
-            System.out.println("Error: variable "+tree.name+" is an array type, not a simple variable");
+            System.out.println("Error: variable "+tree.name+" is an array type, not a simple variable: line " + tree.pos);
             hasError = true;
         }
         
+        return searchResult.getType();
         
     }
     
     
     
-    static private void showTree( IndexVar tree, int spaces ) {
+    static private int showTree( IndexVar tree, int spaces ) {
         if(showAST==true){
             indent( spaces );
             System.out.println( "indexed Variable: " +tree.name );
@@ -415,9 +472,13 @@ abstract public class Absyn {
         
         searchResult=theMap.lookup(tree.name);
         if(searchResult==null){
-            System.out.println("Error: variable "+tree.name+" not declared");
+            System.out.println("Error: variable "+tree.name+" not declared: line " + tree.pos);
             hasError = true;
+            
+            return Identifier.VOID;
         }
+        
+        return searchResult.getType();
     }
     
     static private void showTree( NameTy tree, int spaces ) {

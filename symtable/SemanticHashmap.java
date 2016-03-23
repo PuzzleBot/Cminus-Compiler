@@ -25,8 +25,14 @@ public class SemanticHashmap{
     
     /*Insert (declare) a new identifier in the symbol table, with its type.*/
     public void insertIdentifier(Identifier newIdentifier){
-        /*Put the new identifier into the innermost scope*/
-        hashMapList.peek().put(newIdentifier.getName(), newIdentifier);
+        /*Put the new identifier into the innermost scope (or put it in the global scope
+          if its a function)*/
+        if(newIdentifier instanceof FunctionIdentifier){
+            hashMapList.get(0).put(newIdentifier.getName(), newIdentifier);
+        }
+        else{
+            hashMapList.peek().put(newIdentifier.getName(), newIdentifier);
+        }
     }
     
     /*Look for an identifier with the matching name, prioritizing identifiers in the
