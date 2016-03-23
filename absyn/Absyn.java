@@ -68,7 +68,7 @@ abstract public class Absyn {
             else if( tree instanceof ReturnExp ) 
                 showTree( (ReturnExp)tree, spaces );
             else if( tree instanceof CompoundExp ) 
-                showTree( (CompoundExp)tree, spaces );
+                showTree( (CompoundExp)tree, spaces, true );
     
             else {
                 indent( spaces );
@@ -234,7 +234,7 @@ abstract public class Absyn {
         showTree( tree.exp, spaces + SPACES ); 
     }
     
-    static private void showTree( CompoundExp tree, int spaces ) {
+    static private void showTree( CompoundExp tree, int spaces , boolean createNewScope) {
         if(showAST==true){
             indent( spaces );
             System.out.println( "CompoundExp:" );
@@ -243,15 +243,21 @@ abstract public class Absyn {
         if(showMap==true){
             //System.out.println("entering new scope");
         }
-        theMap.newInnerScope(previousScopeName);
         
+        /*If the new scope has not been created, create it*/
+        if(createNewScope){
+            theMap.newInnerScope(previousScopeName);
+        }
         
         showTree( tree.decs, spaces + SPACES ); 
         showTree( tree.exps, spaces + SPACES ); 
         if(showMap==true){
             theMap.printInnerScope();
         }
-        theMap.deleteInnerScope();
+        
+        if(createNewScope){
+            theMap.deleteInnerScope();
+        }
     }
     
     static private void showTree( VarDecList tree, int spaces ) {
@@ -319,7 +325,7 @@ abstract public class Absyn {
                 //System.out.println("entering new scope");
             }
             
-            //theMap.newInnerScope(previousScopeName);
+            theMap.newInnerScope(previousScopeName);
             showTree( tree.result, spaces + SPACES );
             
             theList = new ArrayList<Identifier>();
@@ -343,14 +349,14 @@ abstract public class Absyn {
                 }
                 
             }
-            theMap.insertIdentifier(thisFunction);
             
 
-            showTree( tree.body, spaces + SPACES );
+            showTree( (CompoundExp)tree.body, spaces + SPACES, false );
             if(showMap==true){
                 //theMap.printInnerScope();
             }
-            //theMap.deleteInnerScope();
+            theMap.deleteInnerScope();
+            theMap.insertIdentifier(thisFunction);
         }
     }
     static private void showTree( SimpleVar tree, int spaces ) {
