@@ -416,14 +416,21 @@ abstract public class Absyn {
     }
     
     static private void showTree( SimpleDec tree, int spaces ) {
-        switch(tree.typ.typ){
-            case NameTy.INT:
-                theMap.insertIdentifier(new Identifier(tree.name, Identifier.INT));
-                break;
-            case NameTy.VOID:
-                /*In case void vars are allowed*/
-                theMap.insertIdentifier(new Identifier(tree.name, Identifier.VOID));
-                break;
+        /*Double declaration check*/
+        if(theMap.hashMapList.peek().get(tree.name) != null){
+            System.out.println("Error: Variable "+tree.name+" is already declared: line " + tree.pos);
+            hasError = true;
+        }
+        else{
+            switch(tree.typ.typ){
+                case NameTy.INT:
+                    theMap.insertIdentifier(new Identifier(tree.name, Identifier.INT));
+                    break;
+                case NameTy.VOID:
+                    /*In case void vars are allowed*/
+                    theMap.insertIdentifier(new Identifier(tree.name, Identifier.VOID));
+                    break;
+            }
         }
         
         if(showAST==true){
@@ -439,7 +446,15 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "ArrayDec: " + tree.name );
         }
-        theMap.insertIdentifier(new Identifier(tree.name,Identifier.INT_ARRAY));
+        
+        if(theMap.hashMapList.peek().get(tree.name) != null){
+            System.out.println("Error: Variable "+tree.name+" is already declared: line " + tree.pos);
+            hasError = true;
+        }
+        else{
+            theMap.insertIdentifier(new Identifier(tree.name,Identifier.INT_ARRAY));
+        }
+        
         showTree( tree.typ, spaces + SPACES );
         
         int arraySizeType = showTree( tree.size, spaces + SPACES );
@@ -510,7 +525,15 @@ abstract public class Absyn {
                 
             }
             
-            theMap.insertIdentifier(thisFunction);
+            /*Double declaration test*/
+            if(theMap.lookup(tree.func) != null){
+                System.out.println("Error: Function "+tree.func+" is already declared: line " + tree.pos);
+                hasError = true;
+            }
+            else{
+                theMap.insertIdentifier(thisFunction);
+            }
+            
             showTree( (CompoundExp)tree.body, spaces + SPACES, false );
             if(showMap==true){
                 //theMap.printInnerScope();
