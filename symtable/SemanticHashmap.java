@@ -28,7 +28,7 @@ public class SemanticHashmap{
         /*Put the new identifier into the innermost scope (or put it in the global scope
           if its a function)*/
         if(newIdentifier instanceof FunctionIdentifier){
-            hashMapList.get(0).put(newIdentifier.getName(), newIdentifier);
+            hashMapList.get(1).put(newIdentifier.getName(), newIdentifier);
         }
         else{
             hashMapList.peek().put(newIdentifier.getName(), newIdentifier);
