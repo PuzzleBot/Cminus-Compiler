@@ -13,12 +13,15 @@ abstract public class Absyn {
     public static String previousScopeName = "noScope";
     public static int type;
     
+    public static boolean hasError = false;
+    
     static private void indent( int spaces ) {
         for( int i = 0; i < spaces; i++ ) System.out.print( " " );
     }
     
     static public void startTraversal( DecList tree ){
         theMap = new SemanticHashmap();
+        hasError = false;
         
         showTree( tree, 0 );
         
@@ -402,9 +405,11 @@ abstract public class Absyn {
         
         if(searchResult==null){
             System.out.println("Error: variable "+tree.name+" not declared");
+            hasError = true;
         }
         else if(searchResult.getType()==Identifier.INT_ARRAY){
             System.out.println("Error: variable "+tree.name+" is an array type, not a simple variable");
+            hasError = true;
         }
         
         
@@ -422,6 +427,7 @@ abstract public class Absyn {
         searchResult=theMap.lookup(tree.name);
         if(searchResult==null){
             System.out.println("Error: variable "+tree.name+" not declared");
+            hasError = true;
         }
     }
     

@@ -59,7 +59,10 @@ class Main {
             Absyn.showAST = false;
             Absyn.showMap = false;
             System.out.println();
-            System.out.println("Error summary: (If nothing follows this line, there are no errors)");
+            
+            if(Absyn.hasError == true){
+                System.out.println("Error summary:");
+            }
             Absyn.startTraversal( (DecList)result );
             
 
