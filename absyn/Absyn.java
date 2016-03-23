@@ -267,7 +267,23 @@ abstract public class Absyn {
                 System.out.println( "VarDecList:" );
             }
             if(tree.head!=null){
-                theList.add(new Identifier(tree.head.name, tree.head.typ.typ));
+                /*tree.head.typ.typ is not Identifier.type, but rather NameTy.type*/
+                if(tree.head instanceof ArrayDec){
+                    theList.add(new Identifier(tree.head.name, Identifier.INT_ARRAY));
+                }
+                else if(tree.head instanceof SimpleDec){
+                    switch(tree.head.typ.typ){
+                        case NameTy.INT:
+                            theList.add(new Identifier(tree.head.name, Identifier.INT));
+                            break;
+                        case NameTy.VOID:
+                            /*In case void vars are allowed*/
+                            theList.add(new Identifier(tree.head.name, Identifier.VOID));
+                            break;
+                    }
+                }
+                
+                //theList.add(new Identifier(tree.head.name, tree.head.typ.typ));
             }
             showTree( tree.head, spaces + SPACES ); 
             showTree( tree.tail, spaces + SPACES ); 
