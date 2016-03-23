@@ -416,7 +416,16 @@ abstract public class Absyn {
     }
     
     static private void showTree( SimpleDec tree, int spaces ) {
-        theMap.insertIdentifier(new Identifier(tree.name, Identifier.INT));
+        switch(tree.typ.typ){
+            case NameTy.INT:
+                theMap.insertIdentifier(new Identifier(tree.name, Identifier.INT));
+                break;
+            case NameTy.VOID:
+                /*In case void vars are allowed*/
+                theMap.insertIdentifier(new Identifier(tree.name, Identifier.VOID));
+                break;
+        }
+        
         if(showAST==true){
             indent( spaces );
             System.out.println( "SimpleDec: " + tree.name );

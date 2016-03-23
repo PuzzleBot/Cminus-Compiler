@@ -1,18 +1,10 @@
-/* A program that uses Euclid’s algorithm to 
-compute gcd (missing one argument to gcd on call)*/
-
-int gcd (int u, int v ) {
-    if (v == 0) 
-        return u;
-    else
-        return gcd(v, u - u / v * v);  /* u-u/v*v == u mod v */
-}
+/* Test 2: Array size type checking, variable type checking (invalid sizes and types)*/
 
 void main (void) {
-    int x;
-    int y;
-    x = input(); 
-    y = input();
-    /*gcd requires two arguments, this will give an error*/
-    output( gcd(x) );
+    int a[2]; int x; void y;
+    a[x] = 1;
+    a[y] = 2;
+
+    x = y;
+    a = x;
 }
