@@ -10,10 +10,10 @@ public class SemanticHashmap{
     /*Constructor for a new syntax table. Automatically declares int input() and void output(int x).*/
     public SemanticHashmap(){
         hashMapList = new Stack<HashMap<String, Identifier>>();
-        hashMapList.push(new HashMap<String, Identifier>());
-        
         scopeNames = new Stack<String>();
-        scopeNames.push("Global");
+        
+        hashMapList.push(new HashMap<String, Identifier>());
+        this.newInnerScope("global");
         
         FunctionIdentifier inputIdentifier = new FunctionIdentifier("input", FunctionIdentifier.FUNCTION_INT);
         FunctionIdentifier outputIdentifier = new FunctionIdentifier("output", FunctionIdentifier.FUNCTION_VOID);

@@ -15,6 +15,16 @@ abstract public class Absyn {
     static private void indent( int spaces ) {
         for( int i = 0; i < spaces; i++ ) System.out.print( " " );
     }
+    
+    static public void startTraversal( DecList tree ){
+        theMap = new SemanticHashmap();
+        
+        showTree( tree, 0 );
+        
+        if(showMap==true){
+            theMap.printInnerScope();
+        }
+    }
 
     static public void showTree( ExpList tree, int spaces ) {
         while( tree != null ) {
@@ -26,14 +36,8 @@ abstract public class Absyn {
     static public void showTree( DecList tree, int spaces ) {
         
         while( tree != null ) {
-            theMap=new SemanticHashmap();
-            
             showTree( tree.head, spaces );
             tree = tree.tail;
-            
-            if(showMap==true){
-               // theMap.printInnerScope();
-            }
         }
     }
 
@@ -265,7 +269,7 @@ abstract public class Absyn {
     }
     
     static private void showTree( SimpleDec tree, int spaces ) {
-        theMap.insertIdentifier(new Identifier(tree.name,Identifier.INT));
+        theMap.insertIdentifier(new Identifier(tree.name, Identifier.INT));
         if(showAST==true){
             indent( spaces );
             System.out.println( "SimpleDec: " + tree.name );

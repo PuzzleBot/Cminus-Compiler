@@ -45,14 +45,14 @@ class Main {
             Absyn.showMap = false;
             if(showTreeFlag == true){
                 System.out.println( "The abstract syntax tree is:" );
-                Absyn.showTree( (DecList)result, 0 );
+                Absyn.startTraversal( (DecList)result );
             }
 
             /*Print the symbol table if the flag says to print it*/
             Absyn.showAST = false;
             Absyn.showMap = showTableFlag;
             if(showTableFlag == true){
-                Absyn.showTree( (DecList)result, 0 );
+                Absyn.startTraversal( (DecList)result );
             }
 
         } catch (Exception e) {
