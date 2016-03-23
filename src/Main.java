@@ -54,6 +54,14 @@ class Main {
             if(showTableFlag == true){
                 Absyn.startTraversal( (DecList)result );
             }
+            
+            /*Print errors without the AST or symbol table*/
+            Absyn.showAST = false;
+            Absyn.showMap = false;
+            System.out.println();
+            System.out.println("Error summary: (If nothing follows this line, there are no errors)");
+            Absyn.startTraversal( (DecList)result );
+            
 
         } catch (Exception e) {
             /* do cleanup here -- possibly rethrow e */
