@@ -8,6 +8,8 @@ abstract public class Absyn {
     public static SemanticHashmap theMap;
     public static boolean showMap = true;
     public static boolean showAST = true;
+    
+    /*Data variables for passing data between tree nodes*/
     public static ArrayList <Identifier> theList;
     public static Identifier searchResult;
     public static String previousScopeName = "noScope";
@@ -55,14 +57,8 @@ abstract public class Absyn {
                 showTree( (IntExp)tree, spaces );
             else if( tree instanceof OpExp )
                 showTree( (OpExp)tree, spaces );
-            else if( tree instanceof ReadExp )
-                showTree( (ReadExp)tree, spaces );
-            else if( tree instanceof RepeatExp )
-                showTree( (RepeatExp)tree, spaces );
             else if( tree instanceof VarExp )
                 showTree( (VarExp)tree, spaces );
-            else if( tree instanceof WriteExp ) 
-                showTree( (WriteExp)tree, spaces );
             else if( tree instanceof NilExp ) 
                 showTree( (NilExp)tree, spaces );
             else if( tree instanceof CallExp ) 
@@ -166,14 +162,6 @@ abstract public class Absyn {
         showTree( tree.left, spaces );
         showTree( tree.right, spaces ); 
     }
-
-    static private void showTree( ReadExp tree, int spaces ) {
-        if(showAST==true){
-            indent( spaces );
-            System.out.println( "ReadExp:" );
-        }
-        showTree( tree.input, spaces + SPACES );  
-    }
     
     static private void showTree( Dec tree, int spaces ) {
         if(showAST==true){
@@ -189,16 +177,6 @@ abstract public class Absyn {
                 showTree( (FunctionDec)tree, spaces );
             
         }
-    }
-
-    static private void showTree( RepeatExp tree, int spaces ) {
-        if(showAST==true){
-            indent( spaces );
-            System.out.println( "RepeatExp:" );
-        }
-        spaces += SPACES;
-        showTree( tree.exps, spaces );
-        showTree( tree.test, spaces ); 
     }
 
     static private void showTree( VarExp tree, int spaces ) {

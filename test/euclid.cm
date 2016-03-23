@@ -26,7 +26,12 @@ int gcd ( int u, int v ) {
 void main (void) {
     int x;
     int y;
+    int result;
+    void z;
     x = input(); 
     y = input();
     output( gcd(x, y) );
+
+    /*Should be an error*/
+    result = x + z;
 }
