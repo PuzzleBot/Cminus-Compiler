@@ -9,7 +9,7 @@ abstract public class Absyn {
     public static boolean showMap = true;
     public static boolean showAST = true;
     public static ArrayList <Identifier> theList;
-    
+    public static Identifier searchResult;
     public static String previousScopeName = "noScope";
     
     static private void indent( int spaces ) {
@@ -195,6 +195,9 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "VarExp: ");
         }
+        
+        
+        
         showTree( tree.name, spaces );
     }
     
@@ -380,13 +383,29 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "Variable: " +tree.name );
         }
+        //run the type test for variable showtree
+        searchResult=theMap.lookup(tree.name);
+        if(searchResult==null){
+            System.out.println("variable "+tree.name+" not declared");
+        }
+        
+        
+        
     }
+    
+    
+    
     static private void showTree( IndexVar tree, int spaces ) {
         if(showAST==true){
             indent( spaces );
             System.out.println( "indexed Variable: " +tree.name );
         }
         showTree(tree.index,spaces);
+        
+        searchResult=theMap.lookup(tree.name);
+        if(searchResult==null){
+            System.out.println("variable "+tree.name+" not declared");
+        }
     }
     
     static private void showTree( NameTy tree, int spaces ) {
