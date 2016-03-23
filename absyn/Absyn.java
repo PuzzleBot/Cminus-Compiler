@@ -49,25 +49,36 @@ abstract public class Absyn {
 
     static private void showTree( Exp tree, int spaces ) {
         if(tree!=null){
+            /*All of these return Identifier types*/
             if( tree instanceof AssignExp )
+                /*Returns type which should be on both sides*/
                 showTree( (AssignExp)tree, spaces );
             else if( tree instanceof IfExp )
+                /*Returns INT*/
                 showTree( (IfExp)tree, spaces );
             else if( tree instanceof IntExp )
+                /*Returns INT*/
                 showTree( (IntExp)tree, spaces );
             else if( tree instanceof OpExp )
+                /*Returns type which should be on both sides*/
                 showTree( (OpExp)tree, spaces );
             else if( tree instanceof VarExp )
+                /*Returns type of variable*/
                 showTree( (VarExp)tree, spaces );
-            else if( tree instanceof NilExp ) 
+            else if( tree instanceof NilExp )
+                /*Returns VOID*/
                 showTree( (NilExp)tree, spaces );
-            else if( tree instanceof CallExp ) 
+            else if( tree instanceof CallExp )
+                /*Returns the return type of the called function*/
                 showTree( (CallExp)tree, spaces );
-            else if( tree instanceof WhileExp ) 
+            else if( tree instanceof WhileExp )
+                /*Returns VOID*/
                 showTree( (WhileExp)tree, spaces );
-            else if( tree instanceof ReturnExp ) 
+            else if( tree instanceof ReturnExp )
+                /*Returns type of the thing returned*/
                 showTree( (ReturnExp)tree, spaces );
-            else if( tree instanceof CompoundExp ) 
+            else if( tree instanceof CompoundExp )
+                /*Returns VOID*/
                 showTree( (CompoundExp)tree, spaces, true );
     
             else {
