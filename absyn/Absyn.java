@@ -16,7 +16,12 @@ abstract public class Absyn {
     public static String currentFunction = "global";
     public static int type;
     
+    /*Lets the driver program there is something wrong and don't generate the code*/
     public static boolean hasError = false;
+    
+    /*For capturing call arguments for typechecking*/
+    public static Stack<ArrayList<Integer>> callTypeListStack;
+    public static boolean getCallTypes = false;
     
     static private void indent( int spaces ) {
         for( int i = 0; i < spaces; i++ ) System.out.print( " " );
@@ -24,6 +29,7 @@ abstract public class Absyn {
     
     static public void startTraversal( DecList tree ){
         theMap = new SemanticHashmap();
+        callTypeListStack = new Stack<ArrayList<Integer>>();
         hasError = false;
         
         showTree( tree, 0 );
@@ -34,8 +40,16 @@ abstract public class Absyn {
     }
 
     static public void showTree( ExpList tree, int spaces ) {
+        int expType;
+        
         while( tree != null ) {
-            showTree( tree.head, spaces );
+            expType = showTree( tree.head, spaces );
+            
+            /*If this expression list is inside a function call, store the types*/
+            if(getCallTypes == true){
+                callTypeListStack.peek().add((Integer)expType);
+            }
+            
             tree = tree.tail;
         } 
     }
@@ -244,7 +258,18 @@ abstract public class Absyn {
             System.out.println( "CallExp: " +tree.func );
         }
         
+        ArrayList<Integer> currentCallArgs;
+        
+        /*Get types of arguments in the call*/
+        getCallTypes = true;
+        
+        callTypeListStack.push(new ArrayList<Integer>());
         showTree( tree.args, spaces + SPACES );
+        currentCallArgs = callTypeListStack.pop();
+        
+        if(callTypeListStack.isEmpty()){
+            getCallTypes = false;
+        }
         
         Identifier currentFuncIdentifier = theMap.lookup(tree.func);
         
@@ -255,7 +280,12 @@ abstract public class Absyn {
             return Identifier.VOID;
         }
         else{
-            //check function call parameters here
+            /*Check function call parameters*/
+            boolean isValidCall = theMap.functionArgCheck(tree.func, currentCallArgs);
+            if(isValidCall == false){
+                System.out.println("Error: Invalid arguments to function " + tree.func + ": line " + tree.pos);
+                hasError = true;
+            }
             
             switch(currentFuncIdentifier.getType()){
                 case FunctionIdentifier.FUNCTION_INT:
@@ -344,7 +374,8 @@ abstract public class Absyn {
                 System.out.println( "VarDecList:" );
             }
             if(tree.head!=null){
-                /*tree.head.typ.typ is not Identifier.type, but rather NameTy.type*/
+                /*tree.head.typ.typ is not Identifier.type, but rather NameTy.type, so
+                  convert it*/
                 if(tree.head instanceof ArrayDec){
                     theList.add(new Identifier(tree.head.name, Identifier.INT_ARRAY));
                 }
