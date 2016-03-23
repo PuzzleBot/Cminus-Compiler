@@ -23,6 +23,9 @@ int gcd ( int u, int v ) {
 }
 
 void main (void) {
+    {
+        int useless;
+    }
     int x;
     int y;
     int result;
