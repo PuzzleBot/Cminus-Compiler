@@ -401,10 +401,10 @@ abstract public class Absyn {
         searchResult=theMap.lookup(tree.name);
         
         if(searchResult==null){
-            System.out.println("variable "+tree.name+" not declared");
+            System.out.println("Error: variable "+tree.name+" not declared");
         }
         else if(searchResult.getType()==Identifier.INT_ARRAY){
-            System.out.println("variable "+tree.name+" is an array type, not a simple variable");
+            System.out.println("Error: variable "+tree.name+" is an array type, not a simple variable");
         }
         
         
@@ -421,7 +421,7 @@ abstract public class Absyn {
         
         searchResult=theMap.lookup(tree.name);
         if(searchResult==null){
-            System.out.println("variable "+tree.name+" not declared");
+            System.out.println("Error: variable "+tree.name+" not declared");
         }
     }
     
