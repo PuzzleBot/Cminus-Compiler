@@ -256,7 +256,15 @@ abstract public class Absyn {
         }
         else{
             //check function call parameters here
-            return currentFuncIdentifier.getType();
+            
+            switch(currentFuncIdentifier.getType()){
+                case FunctionIdentifier.FUNCTION_INT:
+                    return Identifier.INT;
+                case FunctionIdentifier.FUNCTION_VOID:
+                    return Identifier.VOID;
+                default:
+                    return Identifier.VOID;
+            }
         }
     }
     
@@ -276,12 +284,25 @@ abstract public class Absyn {
             System.out.println( "ReturnExp:" );
         }
         
-        //check for function return match
+        /*Check for function return match*/
         Identifier currentFuncIdentifier = theMap.lookup(currentFunction);
         int returnType = showTree( tree.exp, spaces + SPACES );
+        int functionReturnType;
+        
+        switch(currentFuncIdentifier.getType()){
+            case FunctionIdentifier.FUNCTION_INT:
+                functionReturnType = Identifier.INT;
+                break;
+            case FunctionIdentifier.FUNCTION_VOID:
+                functionReturnType = Identifier.VOID;
+                break;
+            default:
+                functionReturnType = Identifier.VOID;
+                break;
+        }
         
         if(currentFuncIdentifier != null){
-            if(currentFuncIdentifier.getType() != returnType){
+            if(functionReturnType != returnType){
                 System.out.println("Error: Returning value of type " + Identifier.typeToString(returnType) + " for function with type " + Identifier.typeToString(currentFuncIdentifier.getType()) + ": line " + tree.pos);
                 hasError = true;
             }
@@ -416,7 +437,7 @@ abstract public class Absyn {
              
              
             if(tree.result.typ==NameTy.VOID){
-               thisFunction=new FunctionIdentifier(tree.func,FunctionIdentifier.FUNCTION_VOID);
+               thisFunction=new FunctionIdentifier(tree.func, FunctionIdentifier.FUNCTION_VOID);
                 
                 for(int i=0;i<theList.size();i++){
                     thisFunction.addToArgs(theList.get(i));
@@ -425,7 +446,7 @@ abstract public class Absyn {
             }
             
             else{
-                thisFunction=new FunctionIdentifier(tree.func,FunctionIdentifier.FUNCTION_INT);
+                thisFunction=new FunctionIdentifier(tree.func, FunctionIdentifier.FUNCTION_INT);
                 for(int i=0;i<theList.size();i++){
                     thisFunction.addToArgs(theList.get(i));
                 }
@@ -478,7 +499,12 @@ abstract public class Absyn {
             return Identifier.VOID;
         }
         
-        return searchResult.getType();
+        if(searchResult.getType() == Identifier.INT_ARRAY){
+            return Identifier.INT;
+        }
+        else{
+            return searchResult.getType();
+        }
     }
     
     static private void showTree( NameTy tree, int spaces ) {
