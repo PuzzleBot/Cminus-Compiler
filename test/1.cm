@@ -1,19 +1,31 @@
-/*Example code from checkpoint 2 evaluation*/
+/* Errorless file - tests as many aspects as possible */
 
-void main(void){
-	int a[2]; int x; int y;
-	a[x] = 1;
-	a[y] = 2;
+int globalVar;
+
+
+int stuff (int de){
+    int x[8];
+    x[0] = 8 + 9;
+    de = 5 + 6;
+	return de;
 }
 
-int fun1(int fff){
-	int x; int y; int z;
-	x = x * 2 + 1
-	y = x + z;
+void notFun(void){
+	return;
 }
 
-void fun2(void){
-	int x;
-	x = 2
-	return x;
+int gcd ( int u, int v ) {
+    if (v == 0) 
+        return u;
+    else
+        return gcd(v, u - u / v * v); /* u-u/v*v == u mod v */
+}
+
+void main (void) {
+    int x;
+    int y;
+    int result;
+    x = input(); 
+    y = input();
+    output( gcd(x, y) );
 }

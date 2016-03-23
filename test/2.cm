@@ -13,5 +13,6 @@ void main (void) {
     int y;
     x = input(); 
     y = input();
+    /*gcd requires two arguments, this will give an error*/
     output( gcd(x) );
 }

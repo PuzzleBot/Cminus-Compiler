@@ -190,6 +190,9 @@ abstract public class Absyn {
                 case OpExp.LE:
                     System.out.println( " <= " );
                     break;
+                case OpExp.GT:
+                    System.out.println( " > " );
+                    break;
                 case OpExp.GE:
                     System.out.println( " >= " );
                     break;
@@ -216,6 +219,20 @@ abstract public class Absyn {
             System.out.println("Error: Value of type " + Identifier.typeToString(rightType) + " used with incompatible type " + Identifier.typeToString(leftType) + ": line " + tree.pos);
             hasError = true;
         }
+        else{
+            /*If this is a comparison statement, both sides must be int*/
+            if((tree.op == OpExp.EQ) || (tree.op == OpExp.LT) || (tree.op == OpExp.LE) || (tree.op == OpExp.GT) || (tree.op == OpExp.GE) || (tree.op == OpExp.NE)){
+                if(leftType != Identifier.INT){
+                    System.out.println("Error: Value of type " + Identifier.typeToString(leftType) + " cannot be used with comparison operator: line " + tree.pos);
+                    hasError = true;
+                }
+                else if(rightType != Identifier.INT){
+                    System.out.println("Error: Value of type " + Identifier.typeToString(rightType) + " cannot be used with comparison operator: line " + tree.pos);
+                    hasError = true;
+                }
+            }
+        }
+        
         
         return leftType;
     }
