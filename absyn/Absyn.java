@@ -243,7 +243,7 @@ abstract public class Absyn {
         if(showMap==true){
             //System.out.println("entering new scope");
         }
-            theMap.newInnerScope(previousScopeName);
+        theMap.newInnerScope(previousScopeName);
         
         
         showTree( tree.decs, spaces + SPACES ); 
@@ -261,7 +261,7 @@ abstract public class Absyn {
                 System.out.println( "VarDecList:" );
             }
             if(tree.head!=null){
-                theList.add(new Identifier(tree.head.name,tree.head.typ.typ));
+                theList.add(new Identifier(tree.head.name, tree.head.typ.typ));
             }
             showTree( tree.head, spaces + SPACES ); 
             showTree( tree.tail, spaces + SPACES ); 
@@ -319,17 +319,12 @@ abstract public class Absyn {
                 //System.out.println("entering new scope");
             }
             
-            
-            
-            theMap.newInnerScope(previousScopeName);
-      
+            //theMap.newInnerScope(previousScopeName);
             showTree( tree.result, spaces + SPACES );
             
-            
-            
-            theList=new ArrayList<Identifier>();
+            theList = new ArrayList<Identifier>();
             showTree( tree.params, spaces + SPACES );
-             FunctionIdentifier thisFunction;
+            FunctionIdentifier thisFunction;
              
              
             if(tree.result.typ==NameTy.VOID){
@@ -339,11 +334,10 @@ abstract public class Absyn {
                     thisFunction.addToArgs(theList.get(i));
                 }
                 
-                
             }
             
             else{
-            thisFunction=new FunctionIdentifier(tree.func,FunctionIdentifier.FUNCTION_INT);
+                thisFunction=new FunctionIdentifier(tree.func,FunctionIdentifier.FUNCTION_INT);
                 for(int i=0;i<theList.size();i++){
                     thisFunction.addToArgs(theList.get(i));
                 }
@@ -354,9 +348,9 @@ abstract public class Absyn {
 
             showTree( tree.body, spaces + SPACES );
             if(showMap==true){
-                theMap.printInnerScope();
+                //theMap.printInnerScope();
             }
-        theMap.deleteInnerScope();
+            //theMap.deleteInnerScope();
         }
     }
     static private void showTree( SimpleVar tree, int spaces ) {
