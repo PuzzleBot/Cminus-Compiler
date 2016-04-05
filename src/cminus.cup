@@ -98,8 +98,8 @@ non terminal WhileExp iteration_stmt;
 non terminal ReturnExp return_stmt; 
 non terminal Var var;
 
-non terminal Exp simple_expression;
-non terminal Integer operation;
+non terminal Exp simple_expression, additive_expression, term;
+non terminal Integer relop, mulop, addop;
 non terminal NameTy type_specifier;
 non terminal Exp expression, factor, statement, expression_stmt;
 non terminal CallExp call;
@@ -214,22 +214,37 @@ var ::= ID:s1 {:RESULT = new SimpleVar(s1left, s1); :}
     | ID:s1 LSQUARE_BRACKET expression:s2 RSQUARE_BRACKET {: RESULT = new IndexVar(s1left, s1, s2); :}
     ;
 
-simple_expression   ::= simple_expression:s1 operation:s2 simple_expression:s3 {:RESULT = new OpExp(s1left, s1, s2, s3); :}
-                    |  factor:s1 {: RESULT = s1; :}
-                    |  simple_expression:s1 error simple_expression:s2 {: parser.report_error("Error on line " + s1left + ": Invalid comparison operator", null); :}
+simple_expression   ::= additive_expression:s1 relop:s2 additive_expression:s3 {:RESULT = new OpExp(s1left, s1, s2, s3); :}
+                    |   additive_expression:s1 {: RESULT = s1; :}
+                    |   additive_expression:s1 error additive_expression:s2 {: parser.report_error("Error on line " + s1left + ": Invalid comparison operator", null); :}
                     ;
 
-operation   ::= PLUS {:RESULT=OpExp.PLUS; :}
-            | MINUS {:RESULT=OpExp.MINUS; :}
-            | MULT {:RESULT=OpExp.MULT;  :}
-            | DIV {:RESULT=OpExp.DIV;  :}
-            | LESS_THAN_EQUAL {:RESULT=OpExp.LE; :}
+
+additive_expression ::= additive_expression:s1 addop:s2 term:s3 {: RESULT = new OpExp(s1left, s1, s2, s3); :}
+                    |   term:s1 {: RESULT = s1; :}
+                    ;
+
+
+term    ::= term:s1 mulop:s2 factor:s3 {: RESULT = new OpExp(s1left, s1, s2, s3); :}
+        |  factor:s1 {: RESULT = s1; :}
+        ;
+
+relop       ::= LESS_THAN_EQUAL {:RESULT=OpExp.LE; :}
             | LESS_THAN {:RESULT=OpExp.LT; :}
             | GREATER_THAN {:RESULT=OpExp.GT; :}
             | GREATER_THAN_EQUAL {:RESULT=OpExp.GE; :}
             | EQUAL {: RESULT=OpExp.EQ;:}
             | NOT_EQUAL {:RESULT=OpExp.NE; :}
             ;
+
+mulop   ::= MULT {:RESULT=OpExp.MULT;  :}
+        | DIV {:RESULT=OpExp.DIV;  :}
+        ;
+
+
+addop   ::= PLUS {:RESULT=OpExp.PLUS; :}
+        | MINUS {:RESULT=OpExp.MINUS; :}
+        ;
 
 factor  ::= LBRACKET expression:s1 RBRACKET {: RESULT = s1; :}
         | var:s1 {: RESULT = new VarExp(s1left, s1); :}
