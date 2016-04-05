@@ -10,10 +10,12 @@ public class Identifier{
     
     protected String name;
     protected int type;
+    protected int memPosition; // For variables, this is the offset from the beginning of the frame
 
-    public Identifier(String name, int type){
+    public Identifier(String name, int type, int memPosition){
         this.name = name;
         this.type = type;
+        this.memPosition = memPosition;
     }
     
     /*Get methods*/
@@ -23,6 +25,10 @@ public class Identifier{
     
     public int getType(){
         return type;
+    }
+
+    public int getMemPosition(){
+        return memPosition;
     }
     
     /*ToString override*/

@@ -15,9 +15,9 @@ public class SemanticHashmap{
         hashMapList.push(new HashMap<String, Identifier>());
         this.newInnerScope("global");
         
-        FunctionIdentifier inputIdentifier = new FunctionIdentifier("input", FunctionIdentifier.FUNCTION_INT);
-        FunctionIdentifier outputIdentifier = new FunctionIdentifier("output", FunctionIdentifier.FUNCTION_VOID);
-        outputIdentifier.addToArgs(new Identifier("x", Identifier.INT));
+        FunctionIdentifier inputIdentifier = new FunctionIdentifier("input", FunctionIdentifier.FUNCTION_INT, 4);
+        FunctionIdentifier outputIdentifier = new FunctionIdentifier("output", FunctionIdentifier.FUNCTION_VOID, 7);
+        outputIdentifier.addToArgs(new Identifier("x", Identifier.INT, 0));
         
         this.insertIdentifier(inputIdentifier);
         this.insertIdentifier(outputIdentifier);
@@ -142,66 +142,5 @@ public class SemanticHashmap{
             System.out.print("    ");
         }
         System.out.println("Leaving \"" + scopeNames.peek() + "\"");
-    }
-    
-    /*Test main*/
-    public static void main(String args[]){
-        SemanticHashmap symbolTable = new SemanticHashmap();
-        FunctionIdentifier gcdIdentifier = new FunctionIdentifier("gcd", FunctionIdentifier.FUNCTION_INT);
-        gcdIdentifier.addToArgs(new Identifier("x", Identifier.INT));
-        gcdIdentifier.addToArgs(new Identifier("y", Identifier.INT));
-        
-        symbolTable.insertIdentifier(gcdIdentifier);
-        symbolTable.insertIdentifier(new Identifier("globalX", Identifier.INT));
-        
-        symbolTable.newInnerScope("gcd");
-        symbolTable.insertIdentifier(new Identifier("varX", Identifier.INT));
-        symbolTable.insertIdentifier(new Identifier("varY", Identifier.INT));
-        
-        Identifier globalIDtest = symbolTable.lookup("globalX");
-        if(globalIDtest == null){
-            System.out.println("globalX not accessible! (fail)");
-        }
-        else{
-            System.out.println("globalX is accessible! (pass)");
-        }
-        
-        globalIDtest = symbolTable.lookup("globalY");
-        if(globalIDtest == null){
-            System.out.println("globalY not accessible! (pass)");
-        }
-        else{
-            System.out.println("globalY is accessible! (fail)");
-        }
-        
-        boolean isInt = symbolTable.typeCheck("globalX", Identifier.INT);
-        if(isInt == true){
-            System.out.println("globalX is an int! (pass)");
-        }
-        else{
-            System.out.println("globalX is not an int! (fail)");
-        }
-        
-        boolean isVoid = symbolTable.typeCheck("globalX", Identifier.VOID);
-        if(isVoid == true){
-            System.out.println("globalX is a void! (fail)");
-        }
-        else{
-            System.out.println("globalX is not a void! (pass)");
-        }
-        
-        symbolTable.printInnerScope();
-        symbolTable.deleteInnerScope();
-        
-        Identifier scopedIDtest = symbolTable.lookup("varX");
-        if(scopedIDtest == null){
-            System.out.println("varX not accessible! (pass)");
-        }
-        else{
-            System.out.println("varX is accessible! (fail)");
-        }
-        
-        symbolTable.printInnerScope();
-        symbolTable.deleteInnerScope();
     }
 }

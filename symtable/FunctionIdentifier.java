@@ -8,9 +8,10 @@ public class FunctionIdentifier extends Identifier{
     public static final int FUNCTION_VOID = 4;
     
     private ArrayList<Identifier> args;
+    // memPosition is the Position of the function's start in memory
     
-    public FunctionIdentifier(String name, int type){
-        super(name, type);
+    public FunctionIdentifier(String name, int type, int memPosition){
+        super(name, type, memPosition);
         args = new ArrayList<Identifier>();
     }
     

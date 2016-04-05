@@ -1,13 +1,18 @@
 package absyn;
 import symtable.*;
 import java.util.*;
+import java.io.*;
+
 abstract public class Absyn {
     public int pos;
+
+    public static String outputFileName = "";
 
     final static int SPACES = 4;
     public static SemanticHashmap theMap;
     public static boolean showMap = true;
     public static boolean showAST = true;
+    public static boolean compileCode = true;
     
     /*Data variables for passing data between tree nodes*/
     public static ArrayList <Identifier> theList;
@@ -32,6 +37,10 @@ abstract public class Absyn {
         callTypeListStack = new Stack<ArrayList<Integer>>();
         hasError = false;
         
+        if(compileCode == true){
+            CodeGen.initFile(outputFileName);
+        }
+
         showTree( tree, 0 );
         
         if(showMap==true){
@@ -216,8 +225,8 @@ abstract public class Absyn {
         rightType = showTree( tree.right, spaces );
         
         if(leftType != rightType){
-            System.out.println("Error: Value of type " + Identifier.typeToString(rightType) + " used with incompatible type " + Identifier.typeToString(leftType) + ": line " + tree.pos);
-            hasError = true;
+            System.out.println("Warning: Value of type " + Identifier.typeToString(rightType) + " used with incompatible type " + Identifier.typeToString(leftType) + ": line " + tree.pos);
+            System.out.println("Value assumed to actually supposed to be int");
         }
         else{
             /*If this is a comparison statement, both sides must be int*/
@@ -394,21 +403,19 @@ abstract public class Absyn {
                 /*tree.head.typ.typ is not Identifier.type, but rather NameTy.type, so
                   convert it*/
                 if(tree.head instanceof ArrayDec){
-                    theList.add(new Identifier(tree.head.name, Identifier.INT_ARRAY));
+                    theList.add(new Identifier(tree.head.name, Identifier.INT_ARRAY, CodeGen.currentVariableOffset));
                 }
                 else if(tree.head instanceof SimpleDec){
                     switch(tree.head.typ.typ){
                         case NameTy.INT:
-                            theList.add(new Identifier(tree.head.name, Identifier.INT));
+                            theList.add(new Identifier(tree.head.name, Identifier.INT, CodeGen.currentVariableOffset));
                             break;
                         case NameTy.VOID:
                             /*In case void vars are allowed*/
-                            theList.add(new Identifier(tree.head.name, Identifier.VOID));
+                            theList.add(new Identifier(tree.head.name, Identifier.VOID, CodeGen.currentVariableOffset));
                             break;
                     }
                 }
-                
-                //theList.add(new Identifier(tree.head.name, tree.head.typ.typ));
             }
             showTree( tree.head, spaces + SPACES ); 
             showTree( tree.tail, spaces + SPACES ); 
@@ -424,11 +431,11 @@ abstract public class Absyn {
         else{
             switch(tree.typ.typ){
                 case NameTy.INT:
-                    theMap.insertIdentifier(new Identifier(tree.name, Identifier.INT));
+                    theMap.insertIdentifier(new Identifier(tree.name, Identifier.INT, CodeGen.currentVariableOffset));
                     break;
                 case NameTy.VOID:
                     /*In case void vars are allowed*/
-                    theMap.insertIdentifier(new Identifier(tree.name, Identifier.VOID));
+                    theMap.insertIdentifier(new Identifier(tree.name, Identifier.VOID, CodeGen.currentVariableOffset));
                     break;
             }
         }
@@ -452,7 +459,7 @@ abstract public class Absyn {
             hasError = true;
         }
         else{
-            theMap.insertIdentifier(new Identifier(tree.name,Identifier.INT_ARRAY));
+            theMap.insertIdentifier(new Identifier(tree.name, Identifier.INT_ARRAY, CodeGen.currentVariableOffset));
         }
         
         showTree( tree.typ, spaces + SPACES );
@@ -507,9 +514,8 @@ abstract public class Absyn {
             showTree( tree.params, spaces + SPACES );
             FunctionIdentifier thisFunction;
              
-             
             if(tree.result.typ==NameTy.VOID){
-               thisFunction=new FunctionIdentifier(tree.func, FunctionIdentifier.FUNCTION_VOID);
+               thisFunction=new FunctionIdentifier(tree.func, FunctionIdentifier.FUNCTION_VOID, CodeGen.currentLine);
                 
                 for(int i=0;i<theList.size();i++){
                     thisFunction.addToArgs(theList.get(i));
@@ -518,7 +524,7 @@ abstract public class Absyn {
             }
             
             else{
-                thisFunction=new FunctionIdentifier(tree.func, FunctionIdentifier.FUNCTION_INT);
+                thisFunction=new FunctionIdentifier(tree.func, FunctionIdentifier.FUNCTION_INT, CodeGen.currentLine);
                 for(int i=0;i<theList.size();i++){
                     thisFunction.addToArgs(theList.get(i));
                 }
@@ -570,7 +576,12 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "indexed Variable: " +tree.name );
         }
-        showTree(tree.index,spaces);
+
+        int indexType = showTree(tree.index,spaces);
+        if(indexType != Identifier.INT){
+            System.out.println("Error: array index may not be int type: line " + tree.pos);
+            hasError = true;
+        }
         
         searchResult=theMap.lookup(tree.name);
         if(searchResult==null){
