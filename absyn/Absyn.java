@@ -491,8 +491,15 @@ abstract public class Absyn {
 
 
         if(compileCode == true){
+            /*Put a pointer to the variable in the variable table*/
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Var Table " + tree.name);
+            CodeGen.currentLine++;
+
             /*Move stack pointer by 1 to allocate*/
             CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Variable " + tree.name);
+            CodeGen.currentLine++;
+            /*Move variable table stack by 1*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Var Table " + tree.name);
             CodeGen.currentLine++;
         }
 
@@ -529,7 +536,15 @@ abstract public class Absyn {
         if(compileCode == true){
             /*Get allocation size*/
             CodeGen.genRecoverResult();
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Variable " + tree.name);
+
+            /*Put a pointer to the variable in the variable table*/
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Var Table " + tree.name);
+            CodeGen.currentLine++;
+            /*Move the stack pointer by the array's length to allocate*/
+            CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.STACK_PTR_REG + ", "+ CodeGen.STACK_PTR_REG + ", "+ CodeGen.RESULT_REG +"   Array Variable " + tree.name);
+            CodeGen.currentLine++;
+            /*Move variable table stack by 1*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Var Table " + tree.name);
             CodeGen.currentLine++;
         }
     }
@@ -558,6 +573,8 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "FunctionDec: " +tree.func );
         }
+
+        /*CODEGEN NOTE: Reset currentVariableOffset*/
         
         previousScopeName = tree.func;
         currentFunction = tree.func;
@@ -569,8 +586,10 @@ abstract public class Absyn {
             }
             
             theMap.newInnerScope(previousScopeName);
+            /*Type*/
             showTree( tree.result, spaces + SPACES );
             
+            /*Parameters*/
             theList = new ArrayList<Identifier>();
             showTree( tree.params, spaces + SPACES );
             FunctionIdentifier thisFunction;
@@ -601,10 +620,9 @@ abstract public class Absyn {
                 theMap.insertIdentifier(thisFunction);
             }
             
+            /*Function body*/
             showTree( (CompoundExp)tree.body, spaces + SPACES, false );
-            if(showMap==true){
-                //theMap.printInnerScope();
-            }
+
             theMap.deleteInnerScope();
         }
     }
@@ -634,12 +652,18 @@ abstract public class Absyn {
             
             if(searchResult.layersDeep == 0){
                 /*Global scope: No use of frame pointer: Variable location = offset*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", " + memOffset + ", 0");
+                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", -" + memOffset + "("+ CodeGen.TABLE_STACK_REG +")");
+                CodeGen.currentLine++;
+                /*Load the data pointed by RESULT_REG into RESULT_REG*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
                 CodeGen.currentLine++;
             }
             else{
                 /*Local scope: Variable location = frame pointer - offset*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", -" + memOffset + "(" + CodeGen.FRAME_PTR_REG + ")");
+                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", -" + memOffset + "("+ CodeGen.TABLE_STACK_REG +")");
+                CodeGen.currentLine++;
+                /*Load the data pointed by RESULT_REG into RESULT_REG*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
                 CodeGen.currentLine++;
             }
         }
@@ -671,30 +695,39 @@ abstract public class Absyn {
         }
 
         if(compileCode == true){
-            /*Variable location: offset+1(framePointer)*/
-            int memOffset = searchResult.getMemPosition() + 1;
+            /*Variable location: offset(framePointer)*/
+            int memOffset = searchResult.getMemPosition();
 
             /*Get the index from memory (stored in the result register)*/
             CodeGen.writer.println("* Array Access");
 
             CodeGen.genRecoverResult();
             
+            /*TABLE_STACK_REG is a pointer to the top(bottom) of the variable table*/
             if(searchResult.layersDeep == 0){
-                /*Global scope: No use of frame pointer: Variable location = offset + index*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.TEMP_REG + ", " + memOffset + ", 0");
+                /*Global scope: No use of frame pointer: Variable location = offset + index
+                  TEMP_REG holds offset, RESULT_REG initially holds index*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TEMP_REG + ", -" + memOffset + "("+ CodeGen.TABLE_STACK_REG +")");
                 CodeGen.currentLine++;
                 CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + ", " + CodeGen.TEMP_REG);
                 CodeGen.currentLine++;
+                /*Load the data pointed by RESULT_REG into RESULT_REG*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
+                CodeGen.currentLine++;
             }
             else{
-                /*Local scope: Variable location = frame pointer - offset + index, frame pointer - offset is the array start*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.TEMP_REG + ", " + memOffset + ", 0    Array start");
+                /*Local scope: Variable location = frame pointer - offset + index, frame pointer - offset is the array start
+                  TEMP_REG holds offset, RESULT_REG initially holds index*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TEMP_REG + ", -" + memOffset + "("+ CodeGen.TABLE_STACK_REG +")");
                 CodeGen.currentLine++;
                 /*(index - offset)*/
                 CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + "," + CodeGen.TEMP_REG + "");
                 CodeGen.currentLine++;
                 /*frame pointer address + (index - offset)*/
                 CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + "," + CodeGen.FRAME_PTR_REG + "");
+                CodeGen.currentLine++;
+                /*Load the data pointed by RESULT_REG into RESULT_REG*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
                 CodeGen.currentLine++;
             }
         }

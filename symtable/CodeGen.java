@@ -7,14 +7,14 @@ abstract public class CodeGen {
     public static final int TEMP_REG = 0;
     public static final int RESULT_REG = 1;
     public static final int OPERAND1_REG = 2;
-    public static final int ADDRESS_REG = 4;    //Free register for storing an address
+    public static final int TABLE_STACK_REG = 4;    //Free register for storing an address
     public static final int FRAME_PTR_REG = 5;  //fp
     public static final int STACK_PTR_REG = 6;  //gp
     public static final int PC = 7;
 
     public static final int VARIABLE_STACK_START = 1024;
 
-    public static int currentLine = 11;
+    public static int currentLine = 12;
     public static int currentVariableOffset = 0;
 
     public static String outputFileName = "";
@@ -41,6 +41,7 @@ abstract public class CodeGen {
             writer.println("  8:     LD  0,-2(5)    load output value");
             writer.println("  9:    OUT  0,0,0  output");
             writer.println(" 10:     LD  7,-1(5)    return to caller");
+            writer.println(" 11:    LDC " + TABLE_STACK_REG + ", 1024, 0     Set starting variable stack");
             writer.println("  3:    LDA  7,7(7)     jump around i/o code");
             writer.println("* End of prelude");
 
