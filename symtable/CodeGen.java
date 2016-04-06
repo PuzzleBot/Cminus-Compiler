@@ -29,28 +29,76 @@ abstract public class CodeGen {
             writer = new PrintWriter(outputFile);
 
             writer.println("* Standard prelude");
-            writer.println("  0:     LD  6,0(0)     load gp with maxaddress");
-            writer.println("  1:    LDA  5,0(6)     copy to gp to fp");
-            writer.println("  2:     ST  0,0(0)     clear location 0");
+            writer.println("  0:     LD  "+ STACK_PTR_REG +", 0(0)     load gp with maxaddress");
+            writer.println("  1:    LDA  "+ FRAME_PTR_REG +", 0("+ STACK_PTR_REG +")     copy to gp to fp");
+            writer.println("  2:     ST  0, 0(0)     clear location 0");
+            writer.println("  3:    LDC " + TABLE_STACK_REG + ", 1024, 0     Set starting variable stack");
+
             writer.println("* code for input routine");
-            writer.println("  4:     ST  0,-1(5)    store return");
-            writer.println("  5:     IN  0,0,0  input");
-            writer.println("  6:     LD  7,-1(5)    return to caller");
+            writer.println("  5:     IN  "+ RESULT_REG +", 0, 0  input");
+            writer.println("  6:    LDA  "+ STACK_PTR_REG +", 0("+ FRAME_PTR_REG + ")    return sequence");
+            writer.println("  7:     LD  "+ TABLE_STACK_REG + ", -1("+ STACK_PTR_REG + ")   Restore frame ptr ");
+            writer.println("  8:     LD  "+ FRAME_PTR_REG + ", -2("+ STACK_PTR_REG + ")   Restore frame ptr ");
+            writer.println("  9:    LDA  "+ STACK_PTR_REG + ", -3("+ STACK_PTR_REG + ")   Move stack ptr down ");
+            writer.println(" 10:     LD  "+ PC + ", 0("+ STACK_PTR_REG + ")   Use return address to return ");
+
             writer.println("* code for output routine");
-            writer.println("  7:     ST  0,-1(5)    store return");
-            writer.println("  8:     LD  0,-2(5)    load output value");
-            writer.println("  9:    OUT  0,0,0  output");
-            writer.println(" 10:     LD  7,-1(5)    return to caller");
-            writer.println(" 11:    LDC " + TABLE_STACK_REG + ", 1024, 0     Set starting variable stack");
-            writer.println("  3:    LDA  7,7(7)     jump around i/o code");
+            writer.println(" 11:     LD  "+ RESULT_REG +", 0("+ FRAME_PTR_REG +")    load output value");
+            writer.println(" 12:    OUT  "+ RESULT_REG +", 0, 0  output");
+            writer.println(" 13:    LDA  "+ STACK_PTR_REG +", 0("+ FRAME_PTR_REG + ")    return sequence");
+            writer.println(" 14:     LD  "+ TABLE_STACK_REG + ", -1("+ STACK_PTR_REG + ")   Restore frame ptr ");
+            writer.println(" 15:     LD  "+ FRAME_PTR_REG + ", -2("+ STACK_PTR_REG + ")   Restore frame ptr ");
+            writer.println(" 16:    LDA  "+ STACK_PTR_REG + ", -3("+ STACK_PTR_REG + ")   Move stack ptr down ");
+            writer.println(" 17:     LD  "+ PC + ", 0("+ STACK_PTR_REG + ")   Use return address to return ");
+
+            writer.println("  4:    LDC  "+ PC +", 18, 0     jump around i/o code");
             writer.println("* End of prelude");
 
-            currentLine = 12;
+            currentLine = 18;
             currentVariableOffset = 0;
         }
         catch(Exception e){
             System.out.println("Output file error.");
         }
+    }
+
+    public static void finish(){
+        int entryLine = Absyn.theMap.lookup("main").memPosition;
+
+        writer.println("* Finale");
+
+        /*Put a the return address in memory*/
+        writer.println(currentLine + ": ST " + PC + ", 0("+ STACK_PTR_REG + ")   Store return address");
+        currentLine++;
+        /*Move stack pointer by 1 to allocate*/
+        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ", 1("+ STACK_PTR_REG + ")   Increment stack ");
+        currentLine++;
+
+        /*Put a the old frame pointer in memory*/
+        writer.println(currentLine + ": ST " + FRAME_PTR_REG + ", 0("+ STACK_PTR_REG + ")   Store frame pointer ");
+        currentLine++;
+        /*Move stack pointer by 1 to allocate*/
+        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ", 1("+ STACK_PTR_REG + ")   Increment stack ");
+        currentLine++;
+
+        /*Put a the old variable table pointer in memory*/
+        writer.println(currentLine + ": ST " + TABLE_STACK_REG + ", 0("+ STACK_PTR_REG + ")   Store frame pointer ");
+        currentLine++;
+        /*Move stack pointer by 1 to allocate*/
+        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ", 1("+ STACK_PTR_REG + ")   Increment stack ");
+        currentLine++;
+
+        /*New frame pointer*/
+        writer.println(currentLine + ": LDA " + FRAME_PTR_REG + ", 0("+ STACK_PTR_REG + ")   Set new frame pointer ");
+        currentLine++;
+
+        /*New PC*/
+        writer.println(currentLine + ": LDC " + PC + ", "+ entryLine +", 0   Jump to main ");
+        currentLine++;
+
+        writer.println(currentLine + ": HALT 0, 0, 0");
+
+        writer.close();
     }
 
     public static void genSaveResult(){

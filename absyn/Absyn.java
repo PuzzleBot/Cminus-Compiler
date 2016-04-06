@@ -48,7 +48,7 @@ abstract public class Absyn {
         }
 
         if(compileCode == true){
-            CodeGen.writer.close();
+            CodeGen.finish();
         }
     }
 
@@ -495,7 +495,7 @@ abstract public class Absyn {
             CodeGen.currentLine++;
 
             /*Put a the old variable table pointer in memory*/
-            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.TABLE_STACK_REG + ", 0("+ CodeGen.STACK_PTR_REG + ")   Store frame pointer ");
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.TABLE_STACK_REG + ", 0("+ CodeGen.STACK_PTR_REG + ")   Store table pointer ");
             CodeGen.currentLine++;
             /*Move stack pointer by 1 to allocate*/
             CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Increment stack ");
@@ -617,7 +617,7 @@ abstract public class Absyn {
             CodeGen.currentLine++;
 
             /*Restore variable table pointer from memory*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.TABLE_STACK_REG + ", -1("+ CodeGen.STACK_PTR_REG + ")   Restore frame ptr ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.TABLE_STACK_REG + ", -1("+ CodeGen.STACK_PTR_REG + ")   Restore table ptr ");
             CodeGen.currentLine++;
 
             /*Restore frame pointer from memory*/
