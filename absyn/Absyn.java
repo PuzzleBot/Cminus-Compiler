@@ -46,6 +46,10 @@ abstract public class Absyn {
         if(showMap==true){
             theMap.printInnerScope();
         }
+
+        if(compileCode == true){
+            CodeGen.writer.close();
+        }
     }
 
     static public void showTree( ExpList tree, int spaces ) {
@@ -243,15 +247,15 @@ abstract public class Absyn {
                     CodeGen.currentLine++;
                     break;
                 case OpExp.MINUS:
-                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Add operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Sub operation");
                     CodeGen.currentLine++;
                     break;
                 case OpExp.MULT:
-                    CodeGen.writer.println(CodeGen.currentLine + ": MUL " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Add operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": MUL " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Mul operation");
                     CodeGen.currentLine++;
                     break;
                 case OpExp.DIV:
-                    CodeGen.writer.println(CodeGen.currentLine + ": DIV " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Add operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": DIV " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Div operation");
                     CodeGen.currentLine++;
                     break;
                 default:
@@ -304,16 +308,6 @@ abstract public class Absyn {
         if(showAST==true){
             indent( spaces );
             System.out.println( "VarExp: ");
-        }
-
-        if(compileCode == true){
-            CodeGen.writer.print("  " + CodeGen.currentLine + ":   LD  " + CodeGen.RESULT_REG + ", ");
-            /*Find and print variable location via tree traversal*/
-            int type = showTree( tree.name, spaces );
-            CodeGen.writer.println("     VarExp variable use");
-            CodeGen.currentLine++;
-
-            return type;
         }
         
         return showTree( tree.name, spaces );
@@ -480,10 +474,12 @@ abstract public class Absyn {
             switch(tree.typ.typ){
                 case NameTy.INT:
                     theMap.insertIdentifier(new Identifier(tree.name, Identifier.INT, CodeGen.currentVariableOffset));
+                    CodeGen.currentVariableOffset++;
                     break;
                 case NameTy.VOID:
                     /*In case void vars are allowed*/
                     theMap.insertIdentifier(new Identifier(tree.name, Identifier.VOID, CodeGen.currentVariableOffset));
+                    CodeGen.currentVariableOffset++;
                     break;
             }
         }
@@ -492,6 +488,14 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "SimpleDec: " + tree.name );
         }
+
+
+        if(compileCode == true){
+            /*Move stack pointer by 1 to allocate*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Variable " + tree.name);
+            CodeGen.currentLine++;
+        }
+
         showTree( tree.typ, spaces + SPACES );
             
     }
@@ -508,10 +512,12 @@ abstract public class Absyn {
         }
         else{
             theMap.insertIdentifier(new Identifier(tree.name, Identifier.INT_ARRAY, CodeGen.currentVariableOffset));
+            CodeGen.currentVariableOffset++;
         }
         
         showTree( tree.typ, spaces + SPACES );
         
+        /*Type is stored in memory, get into result register*/
         int arraySizeType = showTree( tree.size, spaces + SPACES );
         
         if(arraySizeType != Identifier.INT){
@@ -519,6 +525,13 @@ abstract public class Absyn {
             hasError = true;
         }
         
+
+        if(compileCode == true){
+            /*Get allocation size*/
+            CodeGen.genRecoverResult();
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Variable " + tree.name);
+            CodeGen.currentLine++;
+        }
     }
     
     static private void showTree( VarDec tree, int spaces ) {
@@ -614,9 +627,21 @@ abstract public class Absyn {
         }
 
         if(compileCode == true){
-            /*Variable location*/
+            /*Variable location: offset(framePointer)*/
             int memOffset = searchResult.getMemPosition();
-            //CodeGen.writer.print("(" + ")");
+
+            CodeGen.writer.println("* Variable Access");
+            
+            if(searchResult.layersDeep == 0){
+                /*Global scope: No use of frame pointer: Variable location = offset*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", " + memOffset + ", 0");
+                CodeGen.currentLine++;
+            }
+            else{
+                /*Local scope: Variable location = frame pointer - offset*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", -" + memOffset + "(" + CodeGen.FRAME_PTR_REG + ")");
+                CodeGen.currentLine++;
+            }
         }
         
         return searchResult.getType();
@@ -643,6 +668,35 @@ abstract public class Absyn {
             hasError = true;
             
             return Identifier.VOID;
+        }
+
+        if(compileCode == true){
+            /*Variable location: offset+1(framePointer)*/
+            int memOffset = searchResult.getMemPosition() + 1;
+
+            /*Get the index from memory (stored in the result register)*/
+            CodeGen.writer.println("* Array Access");
+
+            CodeGen.genRecoverResult();
+            
+            if(searchResult.layersDeep == 0){
+                /*Global scope: No use of frame pointer: Variable location = offset + index*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.TEMP_REG + ", " + memOffset + ", 0");
+                CodeGen.currentLine++;
+                CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + ", " + CodeGen.TEMP_REG);
+                CodeGen.currentLine++;
+            }
+            else{
+                /*Local scope: Variable location = frame pointer - offset + index, frame pointer - offset is the array start*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.TEMP_REG + ", " + memOffset + ", 0    Array start");
+                CodeGen.currentLine++;
+                /*(index - offset)*/
+                CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + "," + CodeGen.TEMP_REG + "");
+                CodeGen.currentLine++;
+                /*frame pointer address + (index - offset)*/
+                CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + "," + CodeGen.FRAME_PTR_REG + "");
+                CodeGen.currentLine++;
+            }
         }
         
         if(searchResult.getType() == Identifier.INT_ARRAY){

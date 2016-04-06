@@ -10,6 +10,7 @@ abstract public class CodeGen {
     public static final int ADDRESS_REG = 4;    //Free register for storing an address
     public static final int FRAME_PTR_REG = 5;  //fp
     public static final int STACK_PTR_REG = 6;  //gp
+    public static final int PC = 7;
 
     public static final int VARIABLE_STACK_START = 1024;
 
