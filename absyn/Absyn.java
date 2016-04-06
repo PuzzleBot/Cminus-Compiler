@@ -55,6 +55,11 @@ abstract public class Absyn {
     static public void showTree( ExpList tree, int spaces ) {
         int expType;
         int argNumber = 0;
+
+        if(compileCode == true){
+            CodeGen.genComment("Function arguments");
+        }
+
         while( tree != null ) {
             expType = showTree( tree.head, spaces );
             
@@ -143,11 +148,24 @@ abstract public class Absyn {
         }
         spaces += SPACES;
         leftType = showTree( tree.lhs, spaces );
+        if(compileCode == true){
+            /*LHS is in the result register, store it in memory*/
+            CodeGen.genSaveResult();
+        }
+
         rightType = showTree( tree.rhs, spaces );
         
         if(leftType != rightType){
             System.out.println("Error: Assigning value of type " + Identifier.typeToString(rightType) + " to variable of type " + Identifier.typeToString(leftType) + ": line " + tree.pos);
             hasError = true;
+        }
+
+        if(compileCode == true){
+            /*RHS should be in the result register, LHS (var) address should be in memory (put into operand register)*/
+            CodeGen.genRecoverOperand();
+
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.RESULT_REG + ", 0(" + CodeGen.OPERAND1_REG + ")  var equals expression result");
+            CodeGen.currentLine++;
         }
         
         return leftType;
@@ -424,6 +442,12 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "VarExp: ");
         }
+
+        if(compileCode == true){
+            /*Load the data pointed by RESULT_REG into RESULT_REG (in other words, load the variable)*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
+            CodeGen.currentLine++;
+        }
         
         return showTree( tree.name, spaces );
     }
@@ -449,7 +473,8 @@ abstract public class Absyn {
         Identifier currentFuncIdentifier = theMap.lookup(tree.func);
 
         /*Place Frame pointer, alloc frame offset space, return address
-   fp-> arg1              ^
+   fp-> arg1
+        var table ptr     ^
         previous fp       ^ 
         return address    | Stack grows up, return alloc'd first     */
         if(compileCode == true){
@@ -464,6 +489,13 @@ abstract public class Absyn {
 
             /*Put a the old frame pointer in memory*/
             CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.FRAME_PTR_REG + ", 0("+ CodeGen.STACK_PTR_REG + ")   Store frame pointer ");
+            CodeGen.currentLine++;
+            /*Move stack pointer by 1 to allocate*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Increment stack ");
+            CodeGen.currentLine++;
+
+            /*Put a the old variable table pointer in memory*/
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.TABLE_STACK_REG + ", 0("+ CodeGen.STACK_PTR_REG + ")   Store frame pointer ");
             CodeGen.currentLine++;
             /*Move stack pointer by 1 to allocate*/
             CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Increment stack ");
@@ -574,7 +606,7 @@ abstract public class Absyn {
         }
 
         if(compileCode == true){
-            /*Deallocate the frame: stack ptr = frame ptr, old frame ptr is 1 down, return address is 2 down, stack ptr decrement 2*/
+            /*Deallocate the frame: stack ptr = frame ptr, old var table is 1 down, old frame ptr is 2 down, return address is 3 down, stack ptr decrement 2*/
             /*Result is already in the result register*/
             CodeGen.genComment("Return statement");
 
@@ -582,11 +614,15 @@ abstract public class Absyn {
             CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.FRAME_PTR_REG + ")   Stack ptr = frame ptr ");
             CodeGen.currentLine++;
 
-            /*Restore frame pointer from memory*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.FRAME_PTR_REG + ", -1("+ CodeGen.STACK_PTR_REG + ")   Restore frame ptr ");
+            /*Restore variable table pointer from memory*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.TABLE_STACK_REG + ", -1("+ CodeGen.STACK_PTR_REG + ")   Restore frame ptr ");
             CodeGen.currentLine++;
-            /*Move stack pointer down by 2*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", -2("+ CodeGen.STACK_PTR_REG + ")   Move stack ptr down ");
+
+            /*Restore frame pointer from memory*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.FRAME_PTR_REG + ", -2("+ CodeGen.STACK_PTR_REG + ")   Restore frame ptr ");
+            CodeGen.currentLine++;
+            /*Move stack pointer down by 3*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", -3("+ CodeGen.STACK_PTR_REG + ")   Move stack ptr down ");
             CodeGen.currentLine++;
 
             /*Return to caller*/
@@ -603,11 +639,10 @@ abstract public class Absyn {
             System.out.println( "CompoundExp:" );
         }
         
-        int initVarOffset = 0;
+        int initVarOffset = CodeGen.currentVariableOffset;
         /*If the new scope has not been created, create it*/
         if(createNewScope){
             theMap.newInnerScope(previousScopeName);
-            initVarOffset = CodeGen.currentVariableOffset;
         }
         
         showTree( tree.decs, spaces + SPACES );
@@ -622,18 +657,18 @@ abstract public class Absyn {
         
         if(createNewScope){
             theMap.deleteInnerScope();
+        }
+
+        if(compileCode == true){
             newVarOffset = CodeGen.currentVariableOffset;
             int numberOfVars = newVarOffset - initVarOffset;
+            /*Generate: Deallocate local variables (both the stack and variable table stack)*/
 
-            if(compileCode == true){
-                /*Generate: Deallocate local variables (both the stack and variable table stack)*/
-
-                if(numberOfVars > 0){
-                    CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", -" + numberOfVars + "(" + CodeGen.TABLE_STACK_REG + ")  Deallocation: Variable table in scope");
-                    CodeGen.currentLine++;
-                    CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.STACK_PTR_REG + ", 0(" + CodeGen.TABLE_STACK_REG + ")  Deallocation: Scope variables");
-                    CodeGen.currentLine++;
-                }
+            if(numberOfVars > 0){
+                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", -" + numberOfVars + "(" + CodeGen.TABLE_STACK_REG + ")  Deallocation: Variable table in scope");
+                CodeGen.currentLine++;
+                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.STACK_PTR_REG + ", 0(" + CodeGen.TABLE_STACK_REG + ")  Deallocation: Scope variables");
+                CodeGen.currentLine++;
             }
         }
     }
@@ -872,12 +907,16 @@ abstract public class Absyn {
             }
             else{
                 /*Local scope: Variable location = frame pointer - offset*/
+                /*CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", -" + memOffset + "("+ CodeGen.TABLE_STACK_REG +")");
+                CodeGen.currentLine++;*/
                 CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", -" + memOffset + "("+ CodeGen.TABLE_STACK_REG +")");
                 CodeGen.currentLine++;
                 /*Load the data pointed by RESULT_REG into RESULT_REG*/
                 CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
                 CodeGen.currentLine++;
             }
+
+            /*RESULT_REG now contains the address of the variable*/
         }
         
         return searchResult.getType();
