@@ -4,9 +4,11 @@ import java.util.*;
 import java.io.*;
 
 abstract public class CodeGen {
+    public static final int TEMP_REG = 0;
     public static final int RESULT_REG = 1;
     public static final int OPERAND1_REG = 2;
     public static final int OPERAND2_REG = 3;
+    public static final int ADDRESS_REG = 4;    //Free register for storing an address
     public static final int FRAME_PTR_REG = 5;  //fp
     public static final int STACK_PTR_REG = 6;  //gp
 

@@ -227,9 +227,11 @@ abstract public class Absyn {
         Identifier sideB;
         
         leftType = showTree( tree.left, spaces );
-        CodeGen.writer.println("");
+        if(compileCode == true){
+            CodeGen.writer.println("");
 
-        CodeGen.genSaveResult();
+            CodeGen.genSaveResult();
+        }
         rightType = showTree( tree.right, spaces );
         
         if(leftType != rightType){
