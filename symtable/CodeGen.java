@@ -7,7 +7,8 @@ abstract public class CodeGen {
     public static final int RESULT_REG = 1;
     public static final int OPERAND1_REG = 2;
     public static final int OPERAND2_REG = 3;
-    public static final int STACK_PTR_REG = 7;
+    public static final int FRAME_PTR_REG = 5;  //fp
+    public static final int STACK_PTR_REG = 6;  //gp
 
     public static final int VARIABLE_STACK_START = 1024;
 
@@ -26,7 +27,7 @@ abstract public class CodeGen {
             writer = new PrintWriter(outputFile);
 
             writer.println("* Standard prelude");
-            writer.println("  0:     LD  6,0(0)  load gp with maxaddress");
+            writer.println("  0:     LD  6,0(0)     load gp with maxaddress");
             writer.println("  1:    LDA  5,0(6)     copy to gp to fp");
             writer.println("  2:     ST  0,0(0)     clear location 0");
             writer.println("* code for input routine");
@@ -47,55 +48,9 @@ abstract public class CodeGen {
         }
     }
 
-    public static void genStmt( IfExp tree ){
-
-    }
-
-    public static void genStmt( ReturnExp tree ){
-        
-    }
-
-    public static void genStmt( WhileExp tree ){
-
-    }
-
-    public static void genStmt( CompoundExp tree ){
-        
-    }
-
-    public static void genStmt( Exp tree ){
-        
-    }
-
-    public static void genDec( ArrayDec tree ){
-        
-    }
-
-    public static void genDec( SimpleDec tree ){
-        
-    }
-
-    public static void genDec( FunctionDec tree ){
-        
-    }
-
-    public static void genExp( IntExp tree, boolean isAddress ){
-
-    }
-
-    public static void genExp( VarExp tree, boolean isAddress ){
-
-    }
-
-    public static void genExp( OpExp tree, boolean isAddress ){
-
-    }
-
-    public static void genExp( CallExp tree, boolean isAddress ){
-
-    }
-
-    public static void genExp( AssignExp tree, boolean isAddress ){
-
+    public static void genSaveResult(){
+        /*Save the contents of the result register (register 0)*/
+        writer.println("  " + currentLine + ":    ST  0, " + "");
+        currentLine++;
     }
 }

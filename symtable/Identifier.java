@@ -12,10 +12,14 @@ public class Identifier{
     protected int type;
     protected int memPosition; // For variables, this is the offset from the beginning of the frame
 
+    public int layersDeep;
+
     public Identifier(String name, int type, int memPosition){
         this.name = name;
         this.type = type;
         this.memPosition = memPosition;
+
+        layersDeep = 0;
     }
     
     /*Get methods*/

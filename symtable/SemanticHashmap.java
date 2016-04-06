@@ -31,6 +31,7 @@ public class SemanticHashmap{
             hashMapList.get(1).put(newIdentifier.getName(), newIdentifier);
         }
         else{
+            newIdentifier.layersDeep = hashMapList.size();
             hashMapList.peek().put(newIdentifier.getName(), newIdentifier);
         }
     }

@@ -165,7 +165,12 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "IntExp: " + tree.value );
         }
-        
+
+        if(compileCode == true){
+            CodeGen.writer.println("  " + CodeGen.currentLine + ":   LDC  " + CodeGen.RESULT_REG + ", " + tree.value + ", 0     IntExp constant val");
+            CodeGen.currentLine++;
+        }
+
         return Identifier.INT;
     }
 
@@ -222,6 +227,9 @@ abstract public class Absyn {
         Identifier sideB;
         
         leftType = showTree( tree.left, spaces );
+        CodeGen.writer.println("");
+
+        CodeGen.genSaveResult();
         rightType = showTree( tree.right, spaces );
         
         if(leftType != rightType){
@@ -266,6 +274,16 @@ abstract public class Absyn {
         if(showAST==true){
             indent( spaces );
             System.out.println( "VarExp: ");
+        }
+
+        if(compileCode == true){
+            CodeGen.writer.print("  " + CodeGen.currentLine + ":   LD  " + CodeGen.RESULT_REG + ", ");
+            /*Find and print variable location via tree traversal*/
+            int type = showTree( tree.name, spaces );
+            CodeGen.writer.println("     VarExp variable use");
+            CodeGen.currentLine++;
+
+            return type;
         }
         
         return showTree( tree.name, spaces );
@@ -563,6 +581,12 @@ abstract public class Absyn {
         else if(searchResult.getType()==Identifier.INT_ARRAY){
             System.out.println("Error: variable "+tree.name+" is an array type, not a simple variable: line " + tree.pos);
             hasError = true;
+        }
+
+        if(compileCode == true){
+            /*Variable location*/
+            int memOffset = searchResult.getMemPosition();
+            CodeGen.writer.print("("  + ")");
         }
         
         return searchResult.getType();
