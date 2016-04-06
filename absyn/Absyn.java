@@ -54,7 +54,7 @@ abstract public class Absyn {
 
     static public void showTree( ExpList tree, int spaces ) {
         int expType;
-        
+        int argNumber = 0;
         while( tree != null ) {
             expType = showTree( tree.head, spaces );
             
@@ -62,7 +62,14 @@ abstract public class Absyn {
             if(getCallTypes == true){
                 callTypeListStack.peek().add((Integer)expType);
             }
+
+            if(compileCode == true){
+                /*Store arguments in the frame on the stack, in the soon-to-be allocated space (arguments in result register)*/
+                CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.RESULT_REG + ", " + argNumber + "(" + CodeGen.FRAME_PTR_REG + ")");
+                CodeGen.currentLine++;
+            }
             
+            argNumber++;
             tree = tree.tail;
         } 
     }
@@ -168,7 +175,7 @@ abstract public class Absyn {
             if(compileCode == true){
                 /*Branch on false*/
                 branchLength = CodeGen.currentLine - branchLine - 1;
-                CodeGen.writer.println(branchLine + ": JEQ " + CodeGen.RESULT_REG + ", "+ branchLength +"" + CodeGen.PC  + "    Less than");
+                CodeGen.writer.println(branchLine + ": JEQ " + CodeGen.RESULT_REG + ", "+ branchLength +"(" + CodeGen.PC  + ")    If jump");
             }
         }
         else if(tree.elsepart!=null){
@@ -177,7 +184,7 @@ abstract public class Absyn {
             if(compileCode == true){
                 /*Branch on false, one after the unconditional jump*/
                 branchLength = CodeGen.currentLine - branchLine - 1;
-                CodeGen.writer.println(branchLine + ": JEQ " + CodeGen.RESULT_REG + ", "+ branchLength +"" + CodeGen.PC  + "    Less than");
+                CodeGen.writer.println(branchLine + ": JEQ " + CodeGen.RESULT_REG + ", "+ branchLength +"(" + CodeGen.PC  + ")    If jump to else");
             }
 
             int elseStart = CodeGen.currentLine;
@@ -186,7 +193,9 @@ abstract public class Absyn {
             previousScopeName = "else";
             showTree( tree.elsepart, spaces );
 
-            branchLength = CodeGen.currentLine - elseStart - 1;
+            if(compileCode == true){
+                CodeGen.writer.println(unconditionalJump + ": LDC " + CodeGen.PC + ", " + CodeGen.currentLine + ", 0     Jump past else if the if part is true");
+            }
         }
         
         return Identifier.INT;
@@ -436,7 +445,43 @@ abstract public class Absyn {
         
         /*Get types of arguments in the call*/
         getCallTypes = true;
-        
+
+        Identifier currentFuncIdentifier = theMap.lookup(tree.func);
+
+        /*Place Frame pointer, alloc frame offset space, return address
+   fp-> arg1              ^
+        previous fp       ^ 
+        return address    | Stack grows up, return alloc'd first     */
+        if(compileCode == true){
+            CodeGen.genComment("Call setup");
+
+            /*Put a the return address in memory*/
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.PC + ", 0("+ CodeGen.STACK_PTR_REG + ")   Store return address");
+            CodeGen.currentLine++;
+            /*Move stack pointer by 1 to allocate*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Increment stack ");
+            CodeGen.currentLine++;
+
+            /*Put a the old frame pointer in memory*/
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.FRAME_PTR_REG + ", 0("+ CodeGen.STACK_PTR_REG + ")   Store frame pointer ");
+            CodeGen.currentLine++;
+            /*Move stack pointer by 1 to allocate*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Increment stack ");
+            CodeGen.currentLine++;
+
+            /*New frame pointer*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.FRAME_PTR_REG + ", 0("+ CodeGen.STACK_PTR_REG + ")   Set new frame pointer ");
+            CodeGen.currentLine++;
+
+            /*Get function line number*/
+            int functionLine = currentFuncIdentifier.getMemPosition();
+
+            /*New PC*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.PC + ", "+ functionLine +", 0   Jump to function ");
+            CodeGen.currentLine++;
+        }
+
+        /*GenCode Arguments transferred to function here*/
         callTypeListStack.push(new ArrayList<Integer>());
         showTree( tree.args, spaces + SPACES );
         currentCallArgs = callTypeListStack.pop();
@@ -444,8 +489,6 @@ abstract public class Absyn {
         if(callTypeListStack.isEmpty()){
             getCallTypes = false;
         }
-        
-        Identifier currentFuncIdentifier = theMap.lookup(tree.func);
         
         if(currentFuncIdentifier == null){
             System.out.println("Error: Calling undefined function " + tree.func + ": line " + tree.pos);
@@ -478,8 +521,25 @@ abstract public class Absyn {
             indent( spaces );
             System.out.println( "WhileExp:" );
         }
-        showTree( tree.test, spaces + SPACES ); 
+
+        int whileTestLine = CodeGen.currentLine;
+        CodeGen.currentLine++;
+        showTree( tree.test, spaces + SPACES );
+
+        int branchLine = CodeGen.currentLine;
+        CodeGen.currentLine++;
+
         showTree( tree.body, spaces + SPACES ); 
+
+        if(compileCode == true){
+            /*Unconditional jump back to while test*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.PC + ", "+ whileTestLine +", 0    Go back to the while test");
+            CodeGen.currentLine++;
+
+            /*Branch on false*/
+            int branchLength = CodeGen.currentLine - whileTestLine - 1;
+            CodeGen.writer.println(branchLine + ": JEQ " + CodeGen.RESULT_REG + ", "+ branchLength +"(" + CodeGen.PC  + ")    While jump on false: exit loop");
+        }
     }
     
     static private int showTree( ReturnExp tree, int spaces ) {
@@ -489,6 +549,7 @@ abstract public class Absyn {
         }
         
         /*Check for function return match*/
+        /*Return value from the expression is in the result register*/
         Identifier currentFuncIdentifier = theMap.lookup(currentFunction);
         int returnType = showTree( tree.exp, spaces + SPACES );
         int functionReturnType;
@@ -511,6 +572,27 @@ abstract public class Absyn {
                 hasError = true;
             }
         }
+
+        if(compileCode == true){
+            /*Deallocate the frame: stack ptr = frame ptr, old frame ptr is 1 down, return address is 2 down, stack ptr decrement 2*/
+            /*Result is already in the result register*/
+            CodeGen.genComment("Return statement");
+
+            /*Move stack pointer to frame pointer*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.FRAME_PTR_REG + ")   Stack ptr = frame ptr ");
+            CodeGen.currentLine++;
+
+            /*Restore frame pointer from memory*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.FRAME_PTR_REG + ", -1("+ CodeGen.STACK_PTR_REG + ")   Restore frame ptr ");
+            CodeGen.currentLine++;
+            /*Move stack pointer down by 2*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", -2("+ CodeGen.STACK_PTR_REG + ")   Move stack ptr down ");
+            CodeGen.currentLine++;
+
+            /*Return to caller*/
+            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.PC + ", 0("+ CodeGen.STACK_PTR_REG + ")   Use return address to return ");
+            CodeGen.currentLine++;
+        }
         
         return returnType;
     }
@@ -519,10 +601,6 @@ abstract public class Absyn {
         if(showAST==true){
             indent( spaces );
             System.out.println( "CompoundExp:" );
-        }
-        
-        if(showMap==true){
-            //System.out.println("entering new scope");
         }
         
         int initVarOffset = 0;
@@ -617,14 +695,14 @@ abstract public class Absyn {
 
         if(compileCode == true){
             /*Put a pointer to the variable in the variable table*/
-            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Var Table " + tree.name);
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Var Table ");
             CodeGen.currentLine++;
 
             /*Move stack pointer by 1 to allocate*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Variable " + tree.name);
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Variable ");
             CodeGen.currentLine++;
             /*Move variable table stack by 1*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Var Table " + tree.name);
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Var Table ");
             CodeGen.currentLine++;
         }
 
@@ -663,13 +741,13 @@ abstract public class Absyn {
             CodeGen.genRecoverResult();
 
             /*Put a pointer to the variable in the variable table*/
-            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Var Table " + tree.name);
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Var Table ");
             CodeGen.currentLine++;
             /*Move the stack pointer by the array's length to allocate*/
-            CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.STACK_PTR_REG + ", "+ CodeGen.STACK_PTR_REG + ", "+ CodeGen.RESULT_REG +"   Array Variable " + tree.name);
+            CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.STACK_PTR_REG + ", "+ CodeGen.STACK_PTR_REG + ", "+ CodeGen.RESULT_REG +"   Array Variable ");
             CodeGen.currentLine++;
             /*Move variable table stack by 1*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Var Table " + tree.name);
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Var Table ");
             CodeGen.currentLine++;
         }
     }
@@ -711,8 +789,13 @@ abstract public class Absyn {
             
             theMap.newInnerScope(previousScopeName);
             CodeGen.currentVariableOffset = 0;
+
             /*Type*/
             showTree( tree.result, spaces + SPACES );
+
+            /*Record the function's start*/
+            int functionStartLine = CodeGen.currentLine;
+            CodeGen.currentLine++;
 
             /*Parameters, generates code for var declarations*/
             theList = new ArrayList<Identifier>();
@@ -744,10 +827,6 @@ abstract public class Absyn {
             else{
                 theMap.insertIdentifier(thisFunction);
             }
-            
-            /*Record the function's start*/
-            int functionStartLine = CodeGen.currentLine;
-            CodeGen.currentLine++;
 
             /*Function body codegen*/
             showTree( (CompoundExp)tree.body, spaces + SPACES, false );
@@ -781,7 +860,7 @@ abstract public class Absyn {
             /*Variable location: offset(framePointer)*/
             int memOffset = searchResult.getMemPosition();
 
-            CodeGen.writer.println("* Variable Access");
+            CodeGen.genComment("Variable Access");
             
             if(searchResult.layersDeep == 0){
                 /*Global scope: No use of frame pointer: Variable location = offset*/
@@ -832,7 +911,7 @@ abstract public class Absyn {
             int memOffset = searchResult.getMemPosition();
 
             /*Get the index from memory (stored in the result register)*/
-            CodeGen.writer.println("* Array Access");
+            CodeGen.genComment("Array Access");
 
             CodeGen.genRecoverResult();
             

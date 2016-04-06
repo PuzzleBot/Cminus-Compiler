@@ -54,7 +54,7 @@ abstract public class CodeGen {
     }
 
     public static void genSaveResult(){
-        /*Save the contents of the result register (register 0) into the stack*/
+        /*Save the contents of the result register (register 1) into the stack*/
         writer.println(currentLine + ": ST  " + RESULT_REG + ", " + "0(" + STACK_PTR_REG + ")");
         currentLine++;
         writer.println(currentLine + ": LDA " + STACK_PTR_REG + ",  1(" + STACK_PTR_REG + ")");
@@ -73,5 +73,9 @@ abstract public class CodeGen {
         currentLine++;
         writer.println(currentLine + ": LDA " + STACK_PTR_REG + ",  -1(" + STACK_PTR_REG + ")");
         currentLine++;
+    }
+
+    public static void genComment(String comment){
+        writer.println("* " + comment);
     }
 }
