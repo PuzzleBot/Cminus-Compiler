@@ -554,9 +554,11 @@ abstract public class Absyn {
             System.out.println( "WhileExp:" );
         }
 
+        int whileSetupLine = CodeGen.currentLine;
+        showTree( tree.test, spaces + SPACES );
+        /*While test*/
         int whileTestLine = CodeGen.currentLine;
         CodeGen.currentLine++;
-        showTree( tree.test, spaces + SPACES );
 
         int branchLine = CodeGen.currentLine;
         CodeGen.currentLine++;
@@ -565,7 +567,7 @@ abstract public class Absyn {
 
         if(compileCode == true){
             /*Unconditional jump back to while test*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.PC + ", "+ whileTestLine +", 0    Go back to the while test");
+            CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.PC + ", "+ whileSetupLine +", 0    Go back to the while test");
             CodeGen.currentLine++;
 
             /*Branch on false*/
