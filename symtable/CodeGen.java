@@ -7,7 +7,6 @@ abstract public class CodeGen {
     public static final int TEMP_REG = 0;
     public static final int RESULT_REG = 1;
     public static final int OPERAND1_REG = 2;
-    public static final int OPERAND2_REG = 3;
     public static final int ADDRESS_REG = 4;    //Free register for storing an address
     public static final int FRAME_PTR_REG = 5;  //fp
     public static final int STACK_PTR_REG = 6;  //gp
@@ -51,8 +50,24 @@ abstract public class CodeGen {
     }
 
     public static void genSaveResult(){
-        /*Save the contents of the result register (register 0)*/
-        writer.println("  " + currentLine + ":    ST  0, " + "");
+        /*Save the contents of the result register (register 0) into the stack*/
+        writer.println(currentLine + ": ST  " + RESULT_REG + ", " + "0(" + STACK_PTR_REG + ")");
+        currentLine++;
+        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ",  1(" + STACK_PTR_REG + ")");
+        currentLine++;
+    }
+
+    public static void genRecoverResult(){
+        writer.println(currentLine + ": LD  " + RESULT_REG + ", " + "0(" + STACK_PTR_REG + ")");
+        currentLine++;
+        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ",  -1(" + STACK_PTR_REG + ")");
+        currentLine++;
+    }
+
+    public static void genRecoverOperand(){
+        writer.println(currentLine + ": LD  " + OPERAND1_REG + ", " + "0(" + STACK_PTR_REG + ")");
+        currentLine++;
+        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ",  -1(" + STACK_PTR_REG + ")");
         currentLine++;
     }
 }

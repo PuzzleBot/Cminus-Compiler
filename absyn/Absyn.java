@@ -216,6 +216,7 @@ abstract public class Absyn {
                 default:
                     System.out.println( "Error: Unrecognized operator at line " + tree.pos);
                     hasError = true;
+                    break;
             }
         }
         
@@ -226,13 +227,40 @@ abstract public class Absyn {
         Identifier sideA;
         Identifier sideB;
         
+        /*Generate operation code*/
         leftType = showTree( tree.left, spaces );
         if(compileCode == true){
-            CodeGen.writer.println("");
-
             CodeGen.genSaveResult();
         }
         rightType = showTree( tree.right, spaces );
+        if(compileCode == true){
+            CodeGen.genRecoverOperand();
+
+            /*Check operand type*/
+            switch( tree.op ) {
+                case OpExp.PLUS:
+                    CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG + "    Add operation");
+                    CodeGen.currentLine++;
+                    break;
+                case OpExp.MINUS:
+                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Add operation");
+                    CodeGen.currentLine++;
+                    break;
+                case OpExp.MULT:
+                    CodeGen.writer.println(CodeGen.currentLine + ": MUL " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Add operation");
+                    CodeGen.currentLine++;
+                    break;
+                case OpExp.DIV:
+                    CodeGen.writer.println(CodeGen.currentLine + ": DIV " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Add operation");
+                    CodeGen.currentLine++;
+                    break;
+                default:
+                    /*Boolean evaluation expression (if or while): Keep the registers and go back up, then gen*/
+                    break;
+            }
+
+            CodeGen.genSaveResult();
+        }
         
         if(leftType != rightType){
             System.out.println("Warning: Value of type " + Identifier.typeToString(rightType) + " used with incompatible type " + Identifier.typeToString(leftType) + ": line " + tree.pos);
@@ -588,7 +616,7 @@ abstract public class Absyn {
         if(compileCode == true){
             /*Variable location*/
             int memOffset = searchResult.getMemPosition();
-            CodeGen.writer.print("("  + ")");
+            //CodeGen.writer.print("(" + ")");
         }
         
         return searchResult.getType();
