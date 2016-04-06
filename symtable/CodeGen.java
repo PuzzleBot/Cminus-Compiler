@@ -45,6 +45,8 @@ abstract public class CodeGen {
             writer.println("  3:    LDA  7,7(7)     jump around i/o code");
             writer.println("* End of prelude");
 
+            currentLine = 12;
+            currentVariableOffset = 0;
         }
         catch(Exception e){
             System.out.println("Output file error.");

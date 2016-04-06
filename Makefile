@@ -1,7 +1,7 @@
 JAVA=java
 JAVAC=javac
 JFLEX=jflex
-FILE=test/euclid.cm
+FILE=test/gcd.cm
 CLASSPATH=-classpath /usr/share/java/cup.jar:./cup/java-cup-11.jar:.:
 RUNCLASSPATH=-classpath /usr/share/java/cup.jar:.:./bin/:./absyn/:./symtable/
 CUP=$(JAVA) $(CLASSPATH) java_cup.Main -expect 3 <

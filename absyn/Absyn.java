@@ -154,11 +154,39 @@ abstract public class Absyn {
         previousScopeName = "if";
         
         spaces += SPACES;
+
         showTree( tree.test, spaces );
+        /*Result register now holds 0 or 1 for the boolean expression, branch if false*/
+        int branchLine = CodeGen.currentLine;
+        CodeGen.currentLine++;
+
+        int branchLength;
+
         showTree( tree.thenpart, spaces );
-        if(tree.elsepart!=null){
+
+        if(tree.elsepart==null){
+            if(compileCode == true){
+                /*Branch on false*/
+                branchLength = CodeGen.currentLine - branchLine - 1;
+                CodeGen.writer.println(branchLine + ": JEQ " + CodeGen.RESULT_REG + ", "+ branchLength +"" + CodeGen.PC  + "    Less than");
+            }
+        }
+        else if(tree.elsepart!=null){
+            int unconditionalJump = CodeGen.currentLine;
+            CodeGen.currentLine++;
+            if(compileCode == true){
+                /*Branch on false, one after the unconditional jump*/
+                branchLength = CodeGen.currentLine - branchLine - 1;
+                CodeGen.writer.println(branchLine + ": JEQ " + CodeGen.RESULT_REG + ", "+ branchLength +"" + CodeGen.PC  + "    Less than");
+            }
+
+            int elseStart = CodeGen.currentLine;
+            CodeGen.currentLine++;
+
             previousScopeName = "else";
             showTree( tree.elsepart, spaces );
+
+            branchLength = CodeGen.currentLine - elseStart - 1;
         }
         
         return Identifier.INT;
@@ -240,7 +268,8 @@ abstract public class Absyn {
         if(compileCode == true){
             CodeGen.genRecoverOperand();
 
-            /*Check operand type*/
+            /*Check operand type, do operation (result stored in result register)*/
+            /*FOR CONDITIONALS: 1 if true, 0 if false*/
             switch( tree.op ) {
                 case OpExp.PLUS:
                     CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG + "    Add operation");
@@ -258,8 +287,85 @@ abstract public class Absyn {
                     CodeGen.writer.println(CodeGen.currentLine + ": DIV " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Div operation");
                     CodeGen.currentLine++;
                     break;
+                case OpExp.EQ:
+                    /*If equal, Then op1 - op2 = 0 -> skip past*/
+                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Less than");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": JEQ " + CodeGen.RESULT_REG + ", 2(" + CodeGen.PC  + ")    Branch on true");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 0, 0    Put 0 (false) in");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.PC + ", 1(" + CodeGen.PC  + ")    Go to next code segment");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 1, 0    Put 1 (true) in");
+                    CodeGen.currentLine++;
+                    break;
+                case OpExp.LT:
+                    /*If less than, Then op1 - op2 < 0 -> skip past*/
+                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Less than");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": JLT " + CodeGen.RESULT_REG + ", 2(" + CodeGen.PC  + ")    Branch on true");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 0, 0    Put 0 (false) in");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.PC + ", 1(" + CodeGen.PC  + ")    Go to next code segment");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 1, 0    Put 1 (true) in");
+                    CodeGen.currentLine++;
+                    break;
+                case OpExp.LE:
+                    /*If less than equal, Then op1 - op2 <= 0 -> skip past*/
+                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Less than");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": JLE " + CodeGen.RESULT_REG + ", 2(" + CodeGen.PC  + ")    Branch on true");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 0, 0    Put 0 (false) in");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.PC + ", 1(" + CodeGen.PC  + ")    Go to next code segment");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 1, 0    Put 1 (true) in");
+                    CodeGen.currentLine++;
+                    break;
+                case OpExp.GT:
+                    /*If greater than, Then op1 - op2 > 0 -> skip past*/
+                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Less than");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": JGT " + CodeGen.RESULT_REG + ", 2(" + CodeGen.PC  + ")    Branch on true");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 0, 0    Put 0 (false) in");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.PC + ", 1(" + CodeGen.PC  + ")    Go to next code segment");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 1, 0    Put 1 (true) in");
+                    CodeGen.currentLine++;
+                    break;
+                case OpExp.GE:
+                    /*If greater than equal, Then op1 - op2 >= 0 -> skip past*/
+                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Less than");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": JGE " + CodeGen.RESULT_REG + ", 2(" + CodeGen.PC  + ")    Branch on true");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 0, 0    Put 0 (false) in");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.PC + ", 1(" + CodeGen.PC  + ")    Go to next code segment");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 1, 0    Put 1 (true) in");
+                    CodeGen.currentLine++;
+                    break;
+                case OpExp.NE:
+                    /*If greater than equal, Then op1 - op2 != 0 -> skip past*/
+                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Less than");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": JNE " + CodeGen.RESULT_REG + ", 2(" + CodeGen.PC  + ")    Branch on true");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 0, 0    Put 0 (false) in");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.PC + ", 1(" + CodeGen.PC  + ")    Go to next code segment");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.RESULT_REG + ", 1, 0    Put 1 (true) in");
+                    CodeGen.currentLine++;
+                    break;
                 default:
-                    /*Boolean evaluation expression (if or while): Keep the registers and go back up, then gen*/
                     break;
             }
 
@@ -419,12 +525,18 @@ abstract public class Absyn {
             //System.out.println("entering new scope");
         }
         
+        int initVarOffset = 0;
         /*If the new scope has not been created, create it*/
         if(createNewScope){
             theMap.newInnerScope(previousScopeName);
+            initVarOffset = CodeGen.currentVariableOffset;
         }
         
-        showTree( tree.decs, spaces + SPACES ); 
+        showTree( tree.decs, spaces + SPACES );
+
+        /*Number of variables declared in this scope: newVarOffset - initVarOffset*/
+        int newVarOffset;
+
         showTree( tree.exps, spaces + SPACES ); 
         if(showMap==true){
             theMap.printInnerScope();
@@ -432,6 +544,19 @@ abstract public class Absyn {
         
         if(createNewScope){
             theMap.deleteInnerScope();
+            newVarOffset = CodeGen.currentVariableOffset;
+            int numberOfVars = newVarOffset - initVarOffset;
+
+            if(compileCode == true){
+                /*Generate: Deallocate local variables (both the stack and variable table stack)*/
+
+                if(numberOfVars > 0){
+                    CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", -" + numberOfVars + "(" + CodeGen.TABLE_STACK_REG + ")  Deallocation: Variable table in scope");
+                    CodeGen.currentLine++;
+                    CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.STACK_PTR_REG + ", 0(" + CodeGen.TABLE_STACK_REG + ")  Deallocation: Scope variables");
+                    CodeGen.currentLine++;
+                }
+            }
         }
     }
     
@@ -582,14 +707,14 @@ abstract public class Absyn {
         if (tree!=null){
             if(showMap==true){
                 indent( spaces );
-                //System.out.println("entering new scope");
             }
             
             theMap.newInnerScope(previousScopeName);
+            CodeGen.currentVariableOffset = 0;
             /*Type*/
             showTree( tree.result, spaces + SPACES );
-            
-            /*Parameters*/
+
+            /*Parameters, generates code for var declarations*/
             theList = new ArrayList<Identifier>();
             showTree( tree.params, spaces + SPACES );
             FunctionIdentifier thisFunction;
@@ -620,9 +745,17 @@ abstract public class Absyn {
                 theMap.insertIdentifier(thisFunction);
             }
             
-            /*Function body*/
+            /*Record the function's start*/
+            int functionStartLine = CodeGen.currentLine;
+            CodeGen.currentLine++;
+
+            /*Function body codegen*/
             showTree( (CompoundExp)tree.body, spaces + SPACES, false );
 
+            if(compileCode == true){
+                /*Jump around the function*/
+                CodeGen.writer.println(functionStartLine + ": LDC " + CodeGen.PC + ", "+ CodeGen.currentLine +", 0    Function Jump");
+            }
             theMap.deleteInnerScope();
         }
     }

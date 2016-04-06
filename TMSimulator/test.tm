@@ -17,8 +17,11 @@
 17: LDC 0, 105, 0   r0 is now 105
 18: LDC 1, 500, 0   r1 is now 500
 19: ST  1, 105(0)   Store the contents of register 1 at 105 which is 500
-20: LDA 7, 0(0)     Load into PC: The number inside register 0 (not whatever is at the address 0 points to)
+21: LDA 7, 0(0)     Load into PC: The number inside register 0 (not whatever is at the address 0 points to)
+20: JGE 0, 3(7)     Branch less than or equal to 24 (3 + 1)
+
+23: OUT 0, 0, 0
 
 300: LD 0, 0(1)     Load into r0 the contents in memory at the address in r1
-301: LDA 0 0(1)     Load into r0 the stuff inside r1
+301: LDA 0, 0(1)     Load into r0 the stuff inside r1
 
