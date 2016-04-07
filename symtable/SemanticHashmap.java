@@ -15,8 +15,8 @@ public class SemanticHashmap{
         hashMapList.push(new HashMap<String, Identifier>());
         this.newInnerScope("global");
         
-        FunctionIdentifier inputIdentifier = new FunctionIdentifier("input", FunctionIdentifier.FUNCTION_INT, 4);
-        FunctionIdentifier outputIdentifier = new FunctionIdentifier("output", FunctionIdentifier.FUNCTION_VOID, 7);
+        FunctionIdentifier inputIdentifier = new FunctionIdentifier("input", FunctionIdentifier.FUNCTION_INT, 5);
+        FunctionIdentifier outputIdentifier = new FunctionIdentifier("output", FunctionIdentifier.FUNCTION_VOID, 11);
         outputIdentifier.addToArgs(new Identifier("x", Identifier.INT, 0));
         
         this.insertIdentifier(inputIdentifier);

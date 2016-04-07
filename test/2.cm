@@ -1,10 +1,10 @@
-/* Test 2: Array size type checking, variable type checking (invalid sizes and types)*/
-
 void main (void) {
-    int a[2]; int x; void y;
-    a[x] = 1;
-    a[y] = 2;  /*Cannot use void as array size*/
+    int x; int y; int z;
+    x = 5;
+    y = 7;
+    z = y + x;
 
-    x = y;     /*Cannot assign void to int*/
-    a = x;     /*Cannot assign int directly to index without array*/
+    output(x);
+
+    return;
 }

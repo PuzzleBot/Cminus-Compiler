@@ -30,16 +30,16 @@ bin/parser.java: src/cminus.cup
 clean:
 	rm -f bin/parser.java bin/lexer.java bin/sym.java *.class bin/*.class bin/*.java absyn/*.class *~ symtable/*.class
 
-run:
+run: all
 	java $(RUNCLASSPATH) Main $(FILE) -a -s -c
 
-runAST:
+runAST: all
 	java $(RUNCLASSPATH) Main $(FILE) -a
 
-runTable:
+runTable: all
 	java $(RUNCLASSPATH) Main $(FILE) -s
 
-runCodegen:
+runCodegen: all
 	java $(RUNCLASSPATH) Main $(FILE) -c
 
 
