@@ -1,14 +1,14 @@
-int addFive(int x){
-	return x + 5;
-}
-
 void main (void) {
-    int x;
+    int x[5];
+    int z;
 
-    x = 4;
+    x[0] = 4;
+    x[1] = 7;
+    x[2] = 11;
 
-    x = addFive(x);
-    output(x);
+    z = x[2];
+
+    output(z);
 
     return;
 }

@@ -56,7 +56,7 @@ abstract public class Absyn {
         int expType;
         int argNumber = 0;
 
-        if(compileCode == true){
+        if((getCallTypes == true) && (compileCode == true)){
             CodeGen.genComment("Function arguments");
         }
 
@@ -813,8 +813,7 @@ abstract public class Absyn {
 
         if(compileCode == true){
             CodeGen.genComment("Array declaration: " + tree.name + "[" + tree.size + "]");
-            /*Get allocation size*/
-            CodeGen.genRecoverResult();
+            /*Alloc size is in result*/
 
             /*Put a pointer to the variable in the variable table*/
             CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Pointer-> Var Table ");
@@ -984,11 +983,10 @@ abstract public class Absyn {
         }
 
         if(compileCode == true){
-            /*Variable location: offset(framePointer)*/
+            /*Variable location: offset + index*/
             int memOffset = searchResult.getMemPosition();
 
-            /*Get the index from memory (stored in the result register)*/
-            CodeGen.genComment("Array Access:" + tree.name);
+            CodeGen.genComment("Array Access: " + tree.name);
             
             /*TABLE_STACK_REG is a pointer to the bottom of the variable table*/
             if(searchResult.layersDeep == 0){
@@ -996,8 +994,9 @@ abstract public class Absyn {
                   TEMP_REG holds offset, RESULT_REG initially holds index*/
                 /*1024 is the bottom, variable is at location bottom + offset + index*/
 
-                /*Get the index back into the operand register*/
-                CodeGen.genRecoverOperand();
+                /*Move the index into the operand register*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.OPERAND1_REG + ", 0("+ CodeGen.RESULT_REG +")");
+                CodeGen.currentLine++;
 
                 CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", 1024(0)");
                 CodeGen.currentLine++;
@@ -1012,11 +1011,13 @@ abstract public class Absyn {
                 CodeGen.currentLine++;
             }
             else{
-                /*Local scope: Variable location = frame pointer - offset + index, frame pointer - offset is the array start
-                  TEMP_REG holds offset, RESULT_REG initially holds index*/
-                CodeGen.genRecoverOperand();
+                /*Local scope, RESULT_REG holds the index*/
 
-                /*Local scope: Variable location = frame pointer + offset*/
+                /*Move the index into the operand register*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.OPERAND1_REG + ", 0("+ CodeGen.RESULT_REG +")");
+                CodeGen.currentLine++;
+
+                /*Local scope: Variable location = frame pointer + offset + index*/
                 CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", " + memOffset + "("+ CodeGen.FRAME_PTR_REG +")");
                 CodeGen.currentLine++;
                 /*Load the data pointed by RESULT_REG into RESULT_REG*/
