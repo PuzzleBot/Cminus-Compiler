@@ -592,9 +592,6 @@ abstract public class Absyn {
         int whileSetupLine = CodeGen.currentLine;
         showTree( tree.test, spaces + SPACES );
         /*While test*/
-        int whileTestLine = CodeGen.currentLine;
-        CodeGen.currentLine++;
-
         int branchLine = CodeGen.currentLine;
         CodeGen.currentLine++;
 
@@ -606,7 +603,7 @@ abstract public class Absyn {
             CodeGen.currentLine++;
 
             /*Branch on false*/
-            int branchLength = CodeGen.currentLine - whileTestLine - 1;
+            int branchLength = CodeGen.currentLine - branchLine - 1;
             CodeGen.writer.println(branchLine + ": JEQ " + CodeGen.RESULT_REG + ", "+ branchLength +"(" + CodeGen.PC  + ")    While jump on false: exit loop");
         }
     }

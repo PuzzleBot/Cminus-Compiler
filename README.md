@@ -32,3 +32,9 @@ the directory "absyn" and within "Absyn.java" class, the showTree function
 is implemented.  In addition, since some java files are generated automatically,
 they may contain variables that are not used, which are safe to ignore in
 the compilation process.
+
+
+** LIMITATIONS **
+
+- All functions must end in a return, including void functions
+- Array indexes are not checked for out of bounds references

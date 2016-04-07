@@ -82,7 +82,7 @@ number = {digit}+
    Z, a and z, or an underscore followed by zero or more letters
    between A and Z, a and z, zero and nine, or an underscore. */
 letter = [a-zA-Z]
-identifier = {letter}+
+identifier = {letter}+{digit}*
    
 %%
 /* ------------------------Lexical Rules Section---------------------- */
