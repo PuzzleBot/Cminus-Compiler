@@ -39,7 +39,7 @@
 * Operation Expression:
 31: ST  1, 0(6)   Store value as a temp value
 32: LDA 6,  1(6)    Stack alloc
-  33:   LDC  1, 2, 0     IntExp constant val
+  33:   LDC  1, 4, 0     IntExp constant val
 34: LDA 6,  -1(6)    Stack dealloc
 35: LD  2, 0(6)   Get value into operand
 36: SUB 1, 2, 1    Less than
@@ -69,7 +69,7 @@
 58: LDA 5, 0(4)   Set new frame pointer 
 51: LDA 3, 8(7)   Store return address
 52: ST 3, 0(4)   Store return address
-59: LDC 7, 26, 0   Jump to function 
+59: LDC 7, 23, 0   Jump to function 
 * Continue after finishing function "recurse"
 * Inner scope non-function deallocation
 * If statement: 
@@ -136,7 +136,7 @@
 104: LDA 5, 0(4)   Set new frame pointer 
 97: LDA 3, 8(7)   Store return address
 98: ST 3, 0(4)   Store return address
-105: LDC 7, 26, 0   Jump to function 
+105: LDC 7, 23, 0   Jump to function 
 * Continue after finishing function "recurse"
 * Assignment Expression
 106: LDA 6,  -1(6)    Stack dealloc
@@ -159,18 +159,24 @@
 113: ST 3, 0(4)   Store return address
 120: LDC 7, 11, 0   Jump to function 
 * Continue after finishing function "output"
+* Return statement:
+121: LDA 4, 0(5)   Table ptr = frame ptr 
+122: LD 6, -1(4)   Restore stack ptr 
+123: LD 5, -2(4)   Restore frame ptr 
+124: LDA 4, -3(4)   Move stack ptr down 
+125: LD 7, 0(4)   Use return address to return 
 * Inner scope non-function deallocation
-121: LDA 4, -1(4)  Deallocation: Variable table in scope
-122: LD 6, 0(4)  Deallocation: Scope variables
-81: LDC 7, 123, 0    Function Jump around
+126: LDA 4, -1(4)  Deallocation: Variable table in scope
+127: LD 6, 0(4)  Deallocation: Scope variables
+81: LDC 7, 128, 0    Function Jump around
 * Finale
-123: LDA 3, 8(7)   Store return address
-124: ST 3, 0(4)   Store return address
-125: LDA 4, 1(4)   Increment stack 
-126: ST 5, 0(4)   Store frame pointer 
-127: LDA 4, 1(4)   Increment stack 
-128: ST 6, 0(4)   Store stack pointer 
-129: LDA 4, 1(4)   Increment stack 
-130: LDA 5, 0(4)   Set new frame pointer 
-131: LDC 7, 82, 0   Jump to main 
-132: HALT 0, 0, 0
+128: LDA 3, 8(7)   Store return address
+129: ST 3, 0(4)   Store return address
+130: LDA 4, 1(4)   Increment stack 
+131: ST 5, 0(4)   Store frame pointer 
+132: LDA 4, 1(4)   Increment stack 
+133: ST 6, 0(4)   Store stack pointer 
+134: LDA 4, 1(4)   Increment stack 
+135: LDA 5, 0(4)   Set new frame pointer 
+136: LDC 7, 82, 0   Jump to main 
+137: HALT 0, 0, 0

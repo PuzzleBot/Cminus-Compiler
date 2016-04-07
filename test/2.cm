@@ -1,6 +1,15 @@
-/*Prints the input if larger than 10, prints 10 otherwise*/
-int addFour(int x){
-	return x + 4;
+/*If x > y, print x.
+  Basic function calls*/
+int addxy4(int x, int y){
+	return (x + y + 4);
+}
+
+int add2(int t){
+	return t + 2;
+}
+
+int complexOp(int x, int y){
+	return add2(x - x / y * y);
 }
 
 void main (void) {
@@ -10,16 +19,19 @@ void main (void) {
     y = 7;  /*Ok up to here*/
 
     x = input();
-    y = addFour(10);
+    y = addxy4(10, 5);
 
     if(x > y){
     	output(x);
     }
     else{
-    	output(y);
+
     }
 
-    output(5000);
+    output(y);
+
+    x = complexOp(x, 2);
+    output(x);
 
     return;
 }

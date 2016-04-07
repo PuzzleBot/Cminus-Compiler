@@ -527,11 +527,6 @@ abstract public class Absyn {
             /*Pass arguments, then load new pc*/
         }
 
-        /*GenCode Arguments transferred to function here
-        callTypeListStack.push(new ArrayList<Integer>());
-        showTree( tree.args, spaces + SPACES );
-        currentCallArgs = callTypeListStack.pop();*/
-
         if(compileCode == true){
             int jumpDistance = CodeGen.currentLine - storeReturnLine1;
 
@@ -875,7 +870,7 @@ abstract public class Absyn {
             FunctionIdentifier thisFunction;
              
             if(tree.result.typ==NameTy.VOID){
-               thisFunction=new FunctionIdentifier(tree.func, FunctionIdentifier.FUNCTION_VOID, CodeGen.currentLine);
+               thisFunction=new FunctionIdentifier(tree.func, FunctionIdentifier.FUNCTION_VOID, functionStartLine+1);
                 
                 for(int i=0;i<theList.size();i++){
                     thisFunction.addToArgs(theList.get(i));
@@ -884,7 +879,7 @@ abstract public class Absyn {
             }
             
             else{
-                thisFunction=new FunctionIdentifier(tree.func, FunctionIdentifier.FUNCTION_INT, CodeGen.currentLine);
+                thisFunction=new FunctionIdentifier(tree.func, FunctionIdentifier.FUNCTION_INT, functionStartLine+1);
                 for(int i=0;i<theList.size();i++){
                     thisFunction.addToArgs(theList.get(i));
                 }

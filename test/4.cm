@@ -1,6 +1,8 @@
+/*Recursion program*/
+
 int recurse(int x){
     int y;
-    if(x < 2){
+    if(x < 4){
         recurse(x+1);
     }
     output(x);
@@ -15,4 +17,6 @@ void main (void) {
 
     number = recurse(0);
     output(number);
+
+    return;
 }
