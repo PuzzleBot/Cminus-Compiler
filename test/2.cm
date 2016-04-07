@@ -1,3 +1,5 @@
+/*Prints the largest of two numbers*/
+
 void main (void) {
     int x;
     int y;
@@ -5,10 +7,16 @@ void main (void) {
     y = 7;  /*Ok up to here*/
 
     x = 5 + 8 * 10;
-    y = x + 6;
+    y = x + 4;
 
-    output(x);
-    output(y);
+    if(x > y){
+    	output(x);
+    }
+    else{
+    	output(y);
+    }
+
+    output(5000);
 
     return;
 }

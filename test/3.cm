@@ -1,6 +1,14 @@
+int addFive(int x){
+	return x + 5;
+}
+
 void main (void) {
     int x;
-    x = 5;
+
+    x = 4;
+
+    x = addFive(x);
+    output(x);
 
     return;
 }

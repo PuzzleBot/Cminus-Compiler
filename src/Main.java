@@ -67,10 +67,12 @@ class Main {
             
             if(Absyn.hasError == true){
                 System.out.println("Error summary:");
+                Absyn.startTraversal( (DecList)result );
             }
-
-            Absyn.compileCode = genCodeFlag;
-            Absyn.startTraversal( (DecList)result );
+            else{
+                Absyn.compileCode = genCodeFlag;
+                Absyn.startTraversal( (DecList)result );
+            }
 
 
             

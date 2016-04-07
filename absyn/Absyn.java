@@ -204,7 +204,7 @@ abstract public class Absyn {
             if(compileCode == true){
                 /*Branch on false, one after the unconditional jump*/
                 CodeGen.genComment("If-else statement: ");
-                branchLength = CodeGen.currentLine - branchLine - 1;
+                branchLength = CodeGen.currentLine - branchLine;
                 CodeGen.writer.println(branchLine + ": JEQ " + CodeGen.RESULT_REG + ", "+ branchLength +"(" + CodeGen.PC  + ")    If jump to else");
             }
 
