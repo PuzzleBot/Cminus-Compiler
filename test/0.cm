@@ -1,5 +1,4 @@
-/* A program that uses Euclid’s algorithm to 
-compute gcd */
+/* "Errors for days" file - tests as many aspects as possible, as many errors as possible */
 
 int globalVar;
 
@@ -23,10 +22,12 @@ int gcd ( int u, int v ) {
 }
 
 void main (void) {
-    int x;
-    int y;
+    void x;
+    void y;
     int result;
     x = input(); 
     y = input();
-    output( gcd(x, y) );
+    output( gcd(x, y, result), x );
+
+    notExist = nope + 1;
 }

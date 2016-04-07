@@ -1,0 +1,32 @@
+/* A program that uses Euclid’s algorithm to 
+compute gcd (Formerly Euclid.cm) */
+
+int globalVar;
+
+
+int stuff (int de){
+    int x[8];
+    x[0] = 8 + 9;
+    de = 5 + 6;
+	return de;
+}
+
+void notFun(void){
+	return;
+}
+
+int gcd ( int u, int v ) {
+    if (v == 0) 
+        return u;
+    else
+        return gcd(v, u - u / v * v); /* u-u/v*v == u mod v */
+}
+
+void main (void) {
+    int x;
+    int y;
+    int result;
+    x = input(); 
+    y = input();
+    output( gcd(x, y) );
+}

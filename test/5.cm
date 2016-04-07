@@ -1,33 +1,16 @@
-/* "Errors for days" file - tests as many aspects as possible, as many errors as possible */
-
-int globalVar;
-
-
-int stuff (int de){
-    int x[8];
-    x[0] = 8 + 9;
-    de = 5 + 6;
-	return de;
-}
-
-void notFun(void){
-	return;
-}
-
-int gcd ( int u, int v ) {
-    if (v == 0) 
-        return u;
-    else
-        return gcd(v, u - u / v * v); /* u-u/v*v == u mod v */
-}
+/*Test 5: Operand matching (Type checking error)*/
 
 void main (void) {
-    void x;
+    int x;
     void y;
-    int result;
-    x = input(); 
-    y = input();
-    output( gcd(x, y, result), x );
 
-    notExist = nope + 1;
+    x = 5;
+
+    x = x + 5;
+    x = y + 5;  /*Cannot use void with int*/
+    y = x + 5;  /*Cannot assign int to void*/
+
+    if(x == y){
+    	/*Cannot use y in comparison*/
+    }
 }
