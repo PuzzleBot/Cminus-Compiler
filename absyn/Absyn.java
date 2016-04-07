@@ -304,19 +304,19 @@ abstract public class Absyn {
             /*FOR CONDITIONALS: 1 if true, 0 if false*/
             switch( tree.op ) {
                 case OpExp.PLUS:
-                    CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.OPERAND1_REG + "    Add operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG + "    Add operation");
                     CodeGen.currentLine++;
                     break;
                 case OpExp.MINUS:
-                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.OPERAND1_REG  + "    Sub operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Sub operation");
                     CodeGen.currentLine++;
                     break;
                 case OpExp.MULT:
-                    CodeGen.writer.println(CodeGen.currentLine + ": MUL " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.OPERAND1_REG  + "    Mul operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": MUL " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Mul operation");
                     CodeGen.currentLine++;
                     break;
                 case OpExp.DIV:
-                    CodeGen.writer.println(CodeGen.currentLine + ": DIV " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.OPERAND1_REG  + "    Div operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": DIV " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Div operation");
                     CodeGen.currentLine++;
                     break;
                 case OpExp.EQ:
