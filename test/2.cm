@@ -1,10 +1,14 @@
 void main (void) {
     int x;
     int y;
-    x = 5;
+    x = 6;
     y = 7;  /*Ok up to here*/
 
-    x = 5 + 8;
+    x = 5 + 8 * 10;
+    y = x + 6;
+
+    output(x);
+    output(y);
 
     return;
 }

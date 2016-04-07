@@ -11,6 +11,7 @@ To test source code like "euclid.cm", type
     Running options (append after the file name):
 	-a : Display the abstract syntax tree
 	-s : Display the symbol table
+	-c : Compile code
 
 Either the syntax tree, symbol table, or both will be displayed on the screen
 depending on flags given.
@@ -21,6 +22,7 @@ test/euclid.cm:
     make run FILE=<filename>          (both -a and -s)
     make runAST FILE=<filename>       (-a only)
     make runTable FILE=<filename>     (-s only)
+    make runCodegen FILE=<filename>   (-c only)
 
 
 To rebuild the parser, type "make clean" and type "make" again.

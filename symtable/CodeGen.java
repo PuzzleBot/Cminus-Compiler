@@ -36,25 +36,29 @@ abstract public class CodeGen {
 
             writer.println("* code for input routine");
             writer.println("  5:     IN  "+ RESULT_REG +", 0, 0  input");
-            writer.println("  6:    LDA  "+ STACK_PTR_REG +", 0("+ FRAME_PTR_REG + ")    return sequence");
-            writer.println("  7:     LD  "+ TABLE_STACK_REG + ", -1("+ STACK_PTR_REG + ")   Restore frame ptr ");
-            writer.println("  8:     LD  "+ FRAME_PTR_REG + ", -2("+ STACK_PTR_REG + ")   Restore frame ptr ");
-            writer.println("  9:    LDA  "+ STACK_PTR_REG + ", -3("+ STACK_PTR_REG + ")   Move stack ptr down ");
-            writer.println(" 10:     LD  "+ PC + ", 0("+ STACK_PTR_REG + ")   Use return address to return ");
+            writer.println("  6:    LDA  "+ TABLE_STACK_REG +", 0("+ FRAME_PTR_REG + ")    return sequence");
+            writer.println("  7:     LD  "+ STACK_PTR_REG + ", -1("+ TABLE_STACK_REG + ")   Restore stack ptr ");
+            writer.println("  8:     LD  "+ FRAME_PTR_REG + ", -2("+ TABLE_STACK_REG + ")   Restore frame ptr ");
+            writer.println("  9:    LDA  "+ TABLE_STACK_REG + ", -3("+ TABLE_STACK_REG + ")   Move table ptr down ");
+            writer.println(" 10:     LD  "+ PC + ", 0("+ TABLE_STACK_REG + ")   Use return address to return ");
 
             writer.println("* code for output routine");
-            writer.println(" 11:     LD  "+ RESULT_REG +", 0("+ FRAME_PTR_REG +")    load output value");
-            writer.println(" 12:    OUT  "+ RESULT_REG +", 0, 0  output");
-            writer.println(" 13:    LDA  "+ STACK_PTR_REG +", 0("+ FRAME_PTR_REG + ")    return sequence");
-            writer.println(" 14:     LD  "+ TABLE_STACK_REG + ", -1("+ STACK_PTR_REG + ")   Restore frame ptr ");
-            writer.println(" 15:     LD  "+ FRAME_PTR_REG + ", -2("+ STACK_PTR_REG + ")   Restore frame ptr ");
-            writer.println(" 16:    LDA  "+ STACK_PTR_REG + ", -3("+ STACK_PTR_REG + ")   Move stack ptr down ");
-            writer.println(" 17:     LD  "+ PC + ", 0("+ STACK_PTR_REG + ")   Use return address to return ");
+            writer.println(" 11:     ST " + STACK_PTR_REG + ", 0("+ TABLE_STACK_REG + ")   Allocate x ");
+            writer.println(" 12:    LDA " + STACK_PTR_REG + ", 1("+ STACK_PTR_REG + ")   Allocate x");
+            writer.println(" 13:    LDA " + TABLE_STACK_REG + ", 1("+ TABLE_STACK_REG + ")   Allocate x");
+            writer.println(" 14:     LD  "+ RESULT_REG +", 0("+ FRAME_PTR_REG +")    load arg x address");
+            writer.println(" 15:     LD  "+ RESULT_REG +", 0("+ RESULT_REG +")    load arg x value");
+            writer.println(" 16:    OUT  "+ RESULT_REG +", 0, 0  output");
+            writer.println(" 17:    LDA  "+ TABLE_STACK_REG +", 0("+ FRAME_PTR_REG + ")    return sequence");
+            writer.println(" 18:     LD  "+ STACK_PTR_REG + ", -1("+ TABLE_STACK_REG + ")   Restore stack ptr ");
+            writer.println(" 19:     LD  "+ FRAME_PTR_REG + ", -2("+ TABLE_STACK_REG + ")   Restore frame ptr ");
+            writer.println(" 20:    LDA  "+ TABLE_STACK_REG + ", -3("+ TABLE_STACK_REG + ")   Move table ptr down ");
+            writer.println(" 21:     LD  "+ PC + ", 0("+ TABLE_STACK_REG + ")   Use return address to return ");
 
-            writer.println("  4:    LDC  "+ PC +", 18, 0     jump around i/o code");
+            writer.println("  4:    LDC  "+ PC +", 22, 0     jump around i/o code");
             writer.println("* End of prelude");
 
-            currentLine = 18;
+            currentLine = 22;
             currentVariableOffset = 0;
         }
         catch(Exception e){
@@ -68,7 +72,7 @@ abstract public class CodeGen {
         writer.println("* Finale");
 
         /*Put a the return address in memory*/
-        writer.println(currentLine + ": LDA " + TEMP_REG + ", 9("+ PC + ")   Store return address");
+        writer.println(currentLine + ": LDA " + TEMP_REG + ", 8("+ PC + ")   Store return address");
         currentLine++;
         writer.println(currentLine + ": ST " + TEMP_REG + ", 0("+ TABLE_STACK_REG + ")   Store return address");
         currentLine++;
@@ -83,8 +87,8 @@ abstract public class CodeGen {
         writer.println(currentLine + ": LDA " + TABLE_STACK_REG + ", 1("+ TABLE_STACK_REG + ")   Increment stack ");
         currentLine++;
 
-        /*Put a the old variable table pointer in memory*/
-        writer.println(currentLine + ": ST " + STACK_PTR_REG + ", 0("+ TABLE_STACK_REG + ")   Store table pointer ");
+        /*Put a the old stack pointer in memory*/
+        writer.println(currentLine + ": ST " + STACK_PTR_REG + ", 0("+ TABLE_STACK_REG + ")   Store stack pointer ");
         currentLine++;
         /*Move stack pointer by 1 to allocate*/
         writer.println(currentLine + ": LDA " + TABLE_STACK_REG + ", 1("+ TABLE_STACK_REG + ")   Increment stack ");
@@ -105,7 +109,7 @@ abstract public class CodeGen {
 
     public static void genSaveResult(){
         /*Save the contents of the result register (register 1) into the stack*/
-        writer.println(currentLine + ": ST  " + RESULT_REG + ", " + "0(" + STACK_PTR_REG + ")   Store value as a temp thing");
+        writer.println(currentLine + ": ST  " + RESULT_REG + ", " + "0(" + STACK_PTR_REG + ")   Store value as a temp value");
         currentLine++;
         writer.println(currentLine + ": LDA " + STACK_PTR_REG + ",  1(" + STACK_PTR_REG + ")    Stack alloc");
         currentLine++;
@@ -125,10 +129,8 @@ abstract public class CodeGen {
         currentLine++;
     }
 
-    public static void genStackResultPush(){
-        writer.println(currentLine + ": ST " + RESULT_REG + ", 0(" + STACK_PTR_REG + ")    Store argument");
-        currentLine++;
-        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ", 1(" + STACK_PTR_REG + ")    Store argument");
+    public static void genStackArgPush(int argOffset){
+        writer.println(currentLine + ": ST " + RESULT_REG + ", " + argOffset + "(" + STACK_PTR_REG + ")    Store argument");
         currentLine++;
     }
 

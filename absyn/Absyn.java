@@ -66,11 +66,11 @@ abstract public class Absyn {
             /*If this expression list is inside a function call, store the types*/
             if(getCallTypes == true){
                 callTypeListStack.peek().add((Integer)expType);
-            }
 
-            if(compileCode == true){
-                /*Store arguments in the frame on the stack, in the soon-to-be allocated space (arguments in result register)*/
-                CodeGen.genStackResultPush();
+                if(compileCode == true){
+                    /*Store arguments in the frame on the stack, in the soon-to-be allocated space (arguments in result register)*/
+                    CodeGen.genStackArgPush(argNumber);
+                }
             }
             
             argNumber++;
@@ -149,7 +149,7 @@ abstract public class Absyn {
         leftType = showTree( tree.lhs, spaces );
         if(compileCode == true){
             /*LHS is in the result register, store it in memory*/
-            CodeGen.genComment("Assignment save result:");
+            CodeGen.genComment("Assignment save result (Variable address):");
             CodeGen.genSaveResult();
         }
 
@@ -162,7 +162,7 @@ abstract public class Absyn {
 
         if(compileCode == true){
             /*RHS should be in the result register, LHS (var) address should be in memory (put into operand register)*/
-            CodeGen.genComment("Assignment right side value");
+            CodeGen.genComment("Assignment Expression");
             CodeGen.genRecoverOperand();
 
             CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.RESULT_REG + ", 0(" + CodeGen.OPERAND1_REG + ")  var equals expression result");
@@ -293,7 +293,7 @@ abstract public class Absyn {
         /*Generate operation code*/
         leftType = showTree( tree.left, spaces );
         if(compileCode == true){
-            CodeGen.genComment("Expression:");
+            CodeGen.genComment("Operation Expression:");
             CodeGen.genSaveResult();
         }
         rightType = showTree( tree.right, spaces );
@@ -401,7 +401,7 @@ abstract public class Absyn {
                     break;
             }
 
-            CodeGen.genSaveResult();
+            //CodeGen.genSaveResult();
         }
         
         if(leftType != rightType){
@@ -452,6 +452,7 @@ abstract public class Absyn {
 
         if(compileCode == true){
             /*Load the variable's data*/
+            CodeGen.genComment("VarExp: Value load");
             CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")   Variable get value");
             CodeGen.currentLine++;
         }
@@ -479,19 +480,28 @@ abstract public class Absyn {
 
         Identifier currentFuncIdentifier = theMap.lookup(tree.func);
 
+        int storeReturnLine1 = 0;
+        int storeReturnLine2 = 0;
+
+        /*GenCode Arguments transferred to function here*/
+        callTypeListStack.push(new ArrayList<Integer>());
+        showTree( tree.args, spaces + SPACES );
+        currentCallArgs = callTypeListStack.pop();
+
         /*Place Frame pointer, alloc frame offset space, return address
    fp-> arg1
         var table ptr     ^
         previous fp       ^ 
         return address    | Stack grows up, return alloc'd first     */
         if(compileCode == true){
-            CodeGen.genComment("Call setup");
+            CodeGen.genComment("Call setup:");
 
-            /*Put a the return address in memory*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TEMP_REG + ", 9("+ CodeGen.PC + ")   Store return address");
+            storeReturnLine1 = CodeGen.currentLine;
             CodeGen.currentLine++;
-            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.TEMP_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Store return address");
+
+            storeReturnLine2 = CodeGen.currentLine;
             CodeGen.currentLine++;
+
             /*Move stack pointer by 1 to allocate*/
             CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Increment stack ");
             CodeGen.currentLine++;
@@ -514,18 +524,30 @@ abstract public class Absyn {
             CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.FRAME_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Set new frame pointer ");
             CodeGen.currentLine++;
 
+            /*Pass arguments, then load new pc*/
+        }
+
+        /*GenCode Arguments transferred to function here
+        callTypeListStack.push(new ArrayList<Integer>());
+        showTree( tree.args, spaces + SPACES );
+        currentCallArgs = callTypeListStack.pop();*/
+
+        if(compileCode == true){
+            int jumpDistance = CodeGen.currentLine - storeReturnLine1;
+
+            /*Put a the return address in memory*/
+            CodeGen.writer.println(storeReturnLine1 + ": LDA " + CodeGen.TEMP_REG + ", "+ jumpDistance +"("+ CodeGen.PC + ")   Store return address");
+            CodeGen.writer.println(storeReturnLine2 + ": ST " + CodeGen.TEMP_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Store return address");
+
             /*Get function line number*/
             int functionLine = currentFuncIdentifier.getMemPosition();
 
             /*New PC*/
             CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.PC + ", "+ functionLine +", 0   Jump to function ");
             CodeGen.currentLine++;
-        }
 
-        /*GenCode Arguments transferred to function here*/
-        callTypeListStack.push(new ArrayList<Integer>());
-        showTree( tree.args, spaces + SPACES );
-        currentCallArgs = callTypeListStack.pop();
+            CodeGen.genComment("Continue after finishing function \"" + tree.func + "\"");
+        }
         
         if(callTypeListStack.isEmpty()){
             getCallTypes = false;
@@ -561,6 +583,10 @@ abstract public class Absyn {
         if(showAST==true){
             indent( spaces );
             System.out.println( "WhileExp:" );
+        }
+
+        if(compileCode == true){
+            CodeGen.genComment("While loop:");
         }
 
         int whileSetupLine = CodeGen.currentLine;
@@ -619,13 +645,13 @@ abstract public class Absyn {
         if(compileCode == true){
             /*Deallocate the frame: stack ptr = frame ptr, old var table is 1 down, old frame ptr is 2 down, return address is 3 down, stack ptr decrement 2*/
             /*Result is already in the result register*/
-            CodeGen.genComment("Return statement");
+            CodeGen.genComment("Return statement:");
 
             /*Move stack pointer to frame pointer*/
             CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 0("+ CodeGen.FRAME_PTR_REG + ")   Table ptr = frame ptr ");
             CodeGen.currentLine++;
 
-            /*Restore variable table pointer from memory*/
+            /*Restore variable stack pointer from memory*/
             CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.STACK_PTR_REG + ", -1("+ CodeGen.TABLE_STACK_REG + ")   Restore stack ptr ");
             CodeGen.currentLine++;
 

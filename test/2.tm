@@ -5,97 +5,150 @@
   3:    LDC 4, 1024, 0     Set starting variable stack
 * code for input routine
   5:     IN  1, 0, 0  input
-  6:    LDA  6, 0(5)    return sequence
-  7:     LD  4, -1(6)   Restore frame ptr 
-  8:     LD  5, -2(6)   Restore frame ptr 
-  9:    LDA  6, -3(6)   Move stack ptr down 
- 10:     LD  7, 0(6)   Use return address to return 
+  6:    LDA  4, 0(5)    return sequence
+  7:     LD  6, -1(4)   Restore stack ptr 
+  8:     LD  5, -2(4)   Restore frame ptr 
+  9:    LDA  4, -3(4)   Move table ptr down 
+ 10:     LD  7, 0(4)   Use return address to return 
 * code for output routine
- 11:     LD  1, 0(5)    load output value
- 12:    OUT  1, 0, 0  output
- 13:    LDA  6, 0(5)    return sequence
- 14:     LD  4, -1(6)   Restore frame ptr 
- 15:     LD  5, -2(6)   Restore frame ptr 
- 16:    LDA  6, -3(6)   Move stack ptr down 
- 17:     LD  7, 0(6)   Use return address to return 
-  4:    LDC  7, 18, 0     jump around i/o code
+ 11:     ST 6, 0(4)   Allocate x 
+ 12:    LDA 6, 1(6)   Allocate x
+ 13:    LDA 4, 1(4)   Allocate x
+ 14:     LD  1, 0(5)    load arg x address
+ 15:     LD  1, 0(1)    load arg x value
+ 16:    OUT  1, 0, 0  output
+ 17:    LDA  4, 0(5)    return sequence
+ 18:     LD  6, -1(4)   Restore stack ptr 
+ 19:     LD  5, -2(4)   Restore frame ptr 
+ 20:    LDA  4, -3(4)   Move table ptr down 
+ 21:     LD  7, 0(4)   Use return address to return 
+  4:    LDC  7, 22, 0     jump around i/o code
 * End of prelude
 * Variable declaration: x
-19: ST 6, 0(4)   Pointer-> Var Table 
-20: LDA 6, 1(6)   Variable 
-21: LDA 4, 1(4)   Var Table 
+23: ST 6, 0(4)   Pointer-> Var Table 
+24: LDA 6, 1(6)   Variable 
+25: LDA 4, 1(4)   Var Table 
 * Variable declaration: y
-22: ST 6, 0(4)   Pointer-> Var Table 
-23: LDA 6, 1(6)   Variable 
-24: LDA 4, 1(4)   Var Table 
+26: ST 6, 0(4)   Pointer-> Var Table 
+27: LDA 6, 1(6)   Variable 
+28: LDA 4, 1(4)   Var Table 
 * Function arguments
 * Variable Access: x
-25: LD 1, 0(5)
-* Assignment save result:
-26: ST  1, 0(6)   Store value as a temp thing
-27: LDA 6,  1(6)    Stack alloc
-  28:   LDC  1, 5, 0     IntExp constant val
-* Assignment right side value
-29: LDA 6,  -1(6)    Stack dealloc
-30: LD  2, 0(6)   Get value into operand
-31: ST 1, 0(2)  var equals expression result
-32: ST 1, 0(6)    Store argument
-33: LDA 6, 1(6)    Store argument
+29: LD 1, 0(5)
+* Assignment save result (Variable address):
+30: ST  1, 0(6)   Store value as a temp value
+31: LDA 6,  1(6)    Stack alloc
+  32:   LDC  1, 6, 0     IntExp constant val
+* Assignment Expression
+33: LDA 6,  -1(6)    Stack dealloc
+34: LD  2, 0(6)   Get value into operand
+35: ST 1, 0(2)  var equals expression result
 * Variable Access: y
-34: LD 1, 1(5)
-* Assignment save result:
-35: ST  1, 0(6)   Store value as a temp thing
-36: LDA 6,  1(6)    Stack alloc
-  37:   LDC  1, 7, 0     IntExp constant val
-* Assignment right side value
-38: LDA 6,  -1(6)    Stack dealloc
-39: LD  2, 0(6)   Get value into operand
-40: ST 1, 0(2)  var equals expression result
-41: ST 1, 0(6)    Store argument
-42: LDA 6, 1(6)    Store argument
+36: LD 1, 1(5)
+* Assignment save result (Variable address):
+37: ST  1, 0(6)   Store value as a temp value
+38: LDA 6,  1(6)    Stack alloc
+  39:   LDC  1, 7, 0     IntExp constant val
+* Assignment Expression
+40: LDA 6,  -1(6)    Stack dealloc
+41: LD  2, 0(6)   Get value into operand
+42: ST 1, 0(2)  var equals expression result
 * Variable Access: x
 43: LD 1, 0(5)
-* Assignment save result:
-44: ST  1, 0(6)   Store value as a temp thing
+* Assignment save result (Variable address):
+44: ST  1, 0(6)   Store value as a temp value
 45: LDA 6,  1(6)    Stack alloc
   46:   LDC  1, 5, 0     IntExp constant val
-* Expression:
-47: ST  1, 0(6)   Store value as a temp thing
+* Operation Expression:
+47: ST  1, 0(6)   Store value as a temp value
 48: LDA 6,  1(6)    Stack alloc
   49:   LDC  1, 8, 0     IntExp constant val
-50: LDA 6,  -1(6)    Stack dealloc
-51: LD  2, 0(6)   Get value into operand
-52: ADD 1, 2, 1    Add operation
-53: ST  1, 0(6)   Store value as a temp thing
-54: LDA 6,  1(6)    Stack alloc
-* Assignment right side value
-55: LDA 6,  -1(6)    Stack dealloc
-56: LD  2, 0(6)   Get value into operand
-57: ST 1, 0(2)  var equals expression result
-58: ST 1, 0(6)    Store argument
-59: LDA 6, 1(6)    Store argument
-* Return statement
-60: LDA 4, 0(5)   Table ptr = frame ptr 
-61: LD 6, -1(4)   Restore stack ptr 
-62: LD 5, -2(4)   Restore frame ptr 
-63: LDA 4, -3(4)   Move stack ptr down 
-64: LD 7, 0(4)   Use return address to return 
-65: ST 1, 0(6)    Store argument
-66: LDA 6, 1(6)    Store argument
-67: ST 1, 0(6)    Store argument
-68: LDA 6, 1(6)    Store argument
+* Operation Expression:
+50: ST  1, 0(6)   Store value as a temp value
+51: LDA 6,  1(6)    Stack alloc
+  52:   LDC  1, 10, 0     IntExp constant val
+53: LDA 6,  -1(6)    Stack dealloc
+54: LD  2, 0(6)   Get value into operand
+55: MUL 1, 2, 1    Mul operation
+56: LDA 6,  -1(6)    Stack dealloc
+57: LD  2, 0(6)   Get value into operand
+58: ADD 1, 2, 1    Add operation
+* Assignment Expression
+59: LDA 6,  -1(6)    Stack dealloc
+60: LD  2, 0(6)   Get value into operand
+61: ST 1, 0(2)  var equals expression result
+* Variable Access: y
+62: LD 1, 1(5)
+* Assignment save result (Variable address):
+63: ST  1, 0(6)   Store value as a temp value
+64: LDA 6,  1(6)    Stack alloc
+* Variable Access: x
+65: LD 1, 0(5)
+* VarExp: Value load
+66: LD 1, 0(1)   Variable get value
+* Operation Expression:
+67: ST  1, 0(6)   Store value as a temp value
+68: LDA 6,  1(6)    Stack alloc
+  69:   LDC  1, 6, 0     IntExp constant val
+70: LDA 6,  -1(6)    Stack dealloc
+71: LD  2, 0(6)   Get value into operand
+72: ADD 1, 2, 1    Add operation
+* Assignment Expression
+73: LDA 6,  -1(6)    Stack dealloc
+74: LD  2, 0(6)   Get value into operand
+75: ST 1, 0(2)  var equals expression result
+* Function arguments
+* Variable Access: x
+76: LD 1, 0(5)
+* VarExp: Value load
+77: LD 1, 0(1)   Variable get value
+78: ST 1, 0(6)    Store argument
+* Call setup:
+81: LDA 4, 1(4)   Increment stack 
+82: ST 5, 0(4)   Store frame pointer 
+83: LDA 4, 1(4)   Increment stack 
+84: ST 6, 0(4)   Store stack pointer 
+85: LDA 4, 1(4)   Increment stack 
+86: LDA 5, 0(4)   Set new frame pointer 
+79: LDA 3, 8(7)   Store return address
+80: ST 3, 0(4)   Store return address
+87: LDC 7, 11, 0   Jump to function 
+* Continue after finishing function "output"
+* Function arguments
+* Variable Access: y
+88: LD 1, 1(5)
+* VarExp: Value load
+89: LD 1, 0(1)   Variable get value
+90: ST 1, 0(6)    Store argument
+* Call setup:
+93: LDA 4, 1(4)   Increment stack 
+94: ST 5, 0(4)   Store frame pointer 
+95: LDA 4, 1(4)   Increment stack 
+96: ST 6, 0(4)   Store stack pointer 
+97: LDA 4, 1(4)   Increment stack 
+98: LDA 5, 0(4)   Set new frame pointer 
+91: LDA 3, 8(7)   Store return address
+92: ST 3, 0(4)   Store return address
+99: LDC 7, 11, 0   Jump to function 
+* Continue after finishing function "output"
+* Return statement:
+100: LDA 4, 0(5)   Table ptr = frame ptr 
+101: LD 6, -1(4)   Restore stack ptr 
+102: LD 5, -2(4)   Restore frame ptr 
+103: LDA 4, -3(4)   Move stack ptr down 
+104: LD 7, 0(4)   Use return address to return 
 * Inner scope non-function deallocation
-69: LDA 4, -2(4)  Deallocation: Variable table in scope
-70: LD 6, 0(4)  Deallocation: Scope variables
-18: LDC 7, 71, 0    Function Jump around
+105: LDA 4, -2(4)  Deallocation: Variable table in scope
+106: LD 6, 0(4)  Deallocation: Scope variables
+22: LDC 7, 107, 0    Function Jump around
 * Finale
-71: LDA 3, 9(7)   Store return address
-72: ST 3, 0(4)   Store return address
-73: LDA 4, 1(4)   Increment stack 
-74: ST 5, 0(4)   Store frame pointer 
-75: LDA 4, 1(4)   Increment stack 
-76: ST 6, 0(4)   Store table pointer 
-77: LDA 4, 1(4)   Increment stack 
-78: LDA 5, 0(4)   Set new frame pointer 
-79: LDC 7, 19, 0   Jump to main 
-80: HALT 0, 0, 0
+107: LDA 3, 8(7)   Store return address
+108: ST 3, 0(4)   Store return address
+109: LDA 4, 1(4)   Increment stack 
+110: ST 5, 0(4)   Store frame pointer 
+111: LDA 4, 1(4)   Increment stack 
+112: ST 6, 0(4)   Store stack pointer 
+113: LDA 4, 1(4)   Increment stack 
+114: LDA 5, 0(4)   Set new frame pointer 
+115: LDC 7, 23, 0   Jump to main 
+116: HALT 0, 0, 0
