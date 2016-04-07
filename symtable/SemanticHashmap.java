@@ -33,7 +33,7 @@ public class SemanticHashmap{
         else{
             newIdentifier.layersDeep = hashMapList.size();
             hashMapList.peek().put(newIdentifier.getName(), newIdentifier);
-        }
+        } 
     }
     
     /*Look for an identifier with the matching name, prioritizing identifiers in the

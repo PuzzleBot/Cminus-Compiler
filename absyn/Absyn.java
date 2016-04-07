@@ -70,8 +70,7 @@ abstract public class Absyn {
 
             if(compileCode == true){
                 /*Store arguments in the frame on the stack, in the soon-to-be allocated space (arguments in result register)*/
-                CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.RESULT_REG + ", " + argNumber + "(" + CodeGen.FRAME_PTR_REG + ")    Store argument");
-                CodeGen.currentLine++;
+                CodeGen.genStackResultPush();
             }
             
             argNumber++;
@@ -305,19 +304,19 @@ abstract public class Absyn {
             /*FOR CONDITIONALS: 1 if true, 0 if false*/
             switch( tree.op ) {
                 case OpExp.PLUS:
-                    CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG + "    Add operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.OPERAND1_REG + "    Add operation");
                     CodeGen.currentLine++;
                     break;
                 case OpExp.MINUS:
-                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Sub operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.OPERAND1_REG  + "    Sub operation");
                     CodeGen.currentLine++;
                     break;
                 case OpExp.MULT:
-                    CodeGen.writer.println(CodeGen.currentLine + ": MUL " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Mul operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": MUL " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.OPERAND1_REG  + "    Mul operation");
                     CodeGen.currentLine++;
                     break;
                 case OpExp.DIV:
-                    CodeGen.writer.println(CodeGen.currentLine + ": DIV " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.RESULT_REG  + "    Div operation");
+                    CodeGen.writer.println(CodeGen.currentLine + ": DIV " + CodeGen.RESULT_REG + ", " + CodeGen.OPERAND1_REG + ", " + CodeGen.OPERAND1_REG  + "    Div operation");
                     CodeGen.currentLine++;
                     break;
                 case OpExp.EQ:
@@ -449,13 +448,15 @@ abstract public class Absyn {
             System.out.println( "VarExp: ");
         }
 
+        int theType = showTree( tree.name, spaces );
+
         if(compileCode == true){
-            /*Load the data pointed by RESULT_REG into RESULT_REG (in other words, load the variable)*/
+            /*Load the variable's data*/
             CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")   Variable get value");
             CodeGen.currentLine++;
         }
         
-        return showTree( tree.name, spaces );
+        return theType;
     }
     
     static private void showTree( NilExp tree, int spaces ) {
@@ -489,28 +490,28 @@ abstract public class Absyn {
             /*Put a the return address in memory*/
             CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TEMP_REG + ", 9("+ CodeGen.PC + ")   Store return address");
             CodeGen.currentLine++;
-            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.TEMP_REG + ", 0("+ CodeGen.STACK_PTR_REG + ")   Store return address");
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.TEMP_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Store return address");
             CodeGen.currentLine++;
             /*Move stack pointer by 1 to allocate*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Increment stack ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Increment stack ");
             CodeGen.currentLine++;
 
             /*Put a the old frame pointer in memory*/
-            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.FRAME_PTR_REG + ", 0("+ CodeGen.STACK_PTR_REG + ")   Store frame pointer ");
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.FRAME_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Store frame pointer ");
             CodeGen.currentLine++;
             /*Move stack pointer by 1 to allocate*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Increment stack ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Increment stack ");
             CodeGen.currentLine++;
 
             /*Put a the old variable table pointer in memory*/
-            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.TABLE_STACK_REG + ", 0("+ CodeGen.STACK_PTR_REG + ")   Store table pointer ");
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Store stack pointer ");
             CodeGen.currentLine++;
             /*Move stack pointer by 1 to allocate*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 1("+ CodeGen.STACK_PTR_REG + ")   Increment stack ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Increment stack ");
             CodeGen.currentLine++;
 
             /*New frame pointer*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.FRAME_PTR_REG + ", 0("+ CodeGen.STACK_PTR_REG + ")   Set new frame pointer ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.FRAME_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Set new frame pointer ");
             CodeGen.currentLine++;
 
             /*Get function line number*/
@@ -621,22 +622,22 @@ abstract public class Absyn {
             CodeGen.genComment("Return statement");
 
             /*Move stack pointer to frame pointer*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.FRAME_PTR_REG + ")   Stack ptr = frame ptr ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 0("+ CodeGen.FRAME_PTR_REG + ")   Table ptr = frame ptr ");
             CodeGen.currentLine++;
 
             /*Restore variable table pointer from memory*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.TABLE_STACK_REG + ", -1("+ CodeGen.STACK_PTR_REG + ")   Restore table ptr ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.STACK_PTR_REG + ", -1("+ CodeGen.TABLE_STACK_REG + ")   Restore stack ptr ");
             CodeGen.currentLine++;
 
             /*Restore frame pointer from memory*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.FRAME_PTR_REG + ", -2("+ CodeGen.STACK_PTR_REG + ")   Restore frame ptr ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.FRAME_PTR_REG + ", -2("+ CodeGen.TABLE_STACK_REG + ")   Restore frame ptr ");
             CodeGen.currentLine++;
             /*Move stack pointer down by 3*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.STACK_PTR_REG + ", -3("+ CodeGen.STACK_PTR_REG + ")   Move stack ptr down ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", -3("+ CodeGen.TABLE_STACK_REG + ")   Move stack ptr down ");
             CodeGen.currentLine++;
 
             /*Return to caller*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.PC + ", 0("+ CodeGen.STACK_PTR_REG + ")   Use return address to return ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.PC + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Use return address to return ");
             CodeGen.currentLine++;
         }
         
@@ -743,7 +744,7 @@ abstract public class Absyn {
             CodeGen.genComment("Variable declaration: " + tree.name);
 
             /*Put a pointer to the variable in the variable table*/
-            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Var Table ");
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Pointer-> Var Table ");
             CodeGen.currentLine++;
 
             /*Move stack pointer by 1 to allocate*/
@@ -790,13 +791,13 @@ abstract public class Absyn {
             CodeGen.genRecoverResult();
 
             /*Put a pointer to the variable in the variable table*/
-            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Var Table ");
+            CodeGen.writer.println(CodeGen.currentLine + ": ST " + CodeGen.STACK_PTR_REG + ", 0("+ CodeGen.TABLE_STACK_REG + ")   Pointer-> Var Table ");
             CodeGen.currentLine++;
             /*Move the stack pointer by the array's length to allocate*/
             CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.STACK_PTR_REG + ", "+ CodeGen.STACK_PTR_REG + ", "+ CodeGen.RESULT_REG +"   Array Variable ");
             CodeGen.currentLine++;
             /*Move variable table stack by 1*/
-            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Var Table ");
+            CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TABLE_STACK_REG + ", 1("+ CodeGen.TABLE_STACK_REG + ")   Var Table alloc ");
             CodeGen.currentLine++;
         }
     }
@@ -915,27 +916,16 @@ abstract public class Absyn {
                 /*1024 is the bottom, variable is at location bottom + offset*/
                 CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.TEMP_REG + ", 1024, 0");
                 CodeGen.currentLine++;
-                /*Global scope: No use of frame pointer: Variable location = offset*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", " + memOffset + "("+ CodeGen.TEMP_REG +")");
-                CodeGen.currentLine++;
-                /*Load the data pointed by RESULT_REG into RESULT_REG*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
-                CodeGen.currentLine++;
-                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
+                /*Load pointer to variable*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", " + memOffset + "("+ CodeGen.TEMP_REG +")    ");
                 CodeGen.currentLine++;
             }
             else{
-                /*1024 is the bottom, variable is at location bottom + offset*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LDC " + CodeGen.TEMP_REG + ", 1024, 0");
+                /*Variable is at fp + offset*/
+                /*Local scope: Variable pointer = frame pointer + offset*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", " + memOffset + "("+ CodeGen.FRAME_PTR_REG +")");
                 CodeGen.currentLine++;
-                /*Local scope: Variable location = frame pointer - offset*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", " + memOffset + "("+ CodeGen.TEMP_REG +")");
-                CodeGen.currentLine++;
-                /*Load the data pointed by RESULT_REG into RESULT_REG*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
-                CodeGen.currentLine++;
-                CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
-                CodeGen.currentLine++;
+
             }
 
             /*RESULT_REG now contains the address of the variable*/
@@ -973,34 +963,41 @@ abstract public class Absyn {
 
             /*Get the index from memory (stored in the result register)*/
             CodeGen.genComment("Array Access:" + tree.name);
-
-            CodeGen.genRecoverResult();
             
             /*TABLE_STACK_REG is a pointer to the bottom of the variable table*/
             if(searchResult.layersDeep == 0){
                 /*Global scope: No use of frame pointer: Variable location = offset + index
                   TEMP_REG holds offset, RESULT_REG initially holds index*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TEMP_REG + ", -" + memOffset + "("+ CodeGen.TABLE_STACK_REG +")");
+                /*1024 is the bottom, variable is at location bottom + offset + index*/
+
+                /*Get the index back into the operand register*/
+                CodeGen.genRecoverOperand();
+
+                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", 1024(0)");
                 CodeGen.currentLine++;
-                CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + ", " + CodeGen.TEMP_REG);
+                /*Global scope: No use of frame pointer: Variable location = bottom + offset*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", " + memOffset + "("+ CodeGen.RESULT_REG +")");
                 CodeGen.currentLine++;
                 /*Load the data pointed by RESULT_REG into RESULT_REG*/
                 CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
+                CodeGen.currentLine++;
+                /*Array index offset inside operand1reg, add*/
+                CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + "," + CodeGen.OPERAND1_REG + "");
                 CodeGen.currentLine++;
             }
             else{
                 /*Local scope: Variable location = frame pointer - offset + index, frame pointer - offset is the array start
                   TEMP_REG holds offset, RESULT_REG initially holds index*/
-                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.TEMP_REG + ", -" + memOffset + "("+ CodeGen.TABLE_STACK_REG +")");
-                CodeGen.currentLine++;
-                /*(index - offset)*/
-                CodeGen.writer.println(CodeGen.currentLine + ": SUB " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + "," + CodeGen.TEMP_REG + "");
-                CodeGen.currentLine++;
-                /*frame pointer address + (index - offset)*/
-                CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + "," + CodeGen.FRAME_PTR_REG + "");
+                CodeGen.genRecoverOperand();
+
+                /*Local scope: Variable location = frame pointer + offset*/
+                CodeGen.writer.println(CodeGen.currentLine + ": LDA " + CodeGen.RESULT_REG + ", " + memOffset + "("+ CodeGen.FRAME_PTR_REG +")");
                 CodeGen.currentLine++;
                 /*Load the data pointed by RESULT_REG into RESULT_REG*/
                 CodeGen.writer.println(CodeGen.currentLine + ": LD " + CodeGen.RESULT_REG + ", 0(" + CodeGen.RESULT_REG + ")");
+                CodeGen.currentLine++;
+                /*Array index offset inside operand1reg, add*/
+                CodeGen.writer.println(CodeGen.currentLine + ": ADD " + CodeGen.RESULT_REG + ", " + CodeGen.RESULT_REG + "," + CodeGen.OPERAND1_REG + "");
                 CodeGen.currentLine++;
             }
         }

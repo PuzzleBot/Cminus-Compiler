@@ -30,7 +30,7 @@ abstract public class CodeGen {
 
             writer.println("* Standard prelude");
             writer.println("  0:    LDC  "+ STACK_PTR_REG +", 0, 0     load gp with 0");
-            writer.println("  1:    LDA  "+ FRAME_PTR_REG +", 0("+ STACK_PTR_REG +")     copy to gp to fp");
+            writer.println("  1:    LDC  "+ FRAME_PTR_REG +", 1024, 0     Frame pointer is at the table bottom");
             writer.println("  2:     ST  0, 0(0)     clear location 0");
             writer.println("  3:    LDC " + TABLE_STACK_REG + ", 1024, 0     Set starting variable stack");
 
@@ -70,28 +70,28 @@ abstract public class CodeGen {
         /*Put a the return address in memory*/
         writer.println(currentLine + ": LDA " + TEMP_REG + ", 9("+ PC + ")   Store return address");
         currentLine++;
-        writer.println(currentLine + ": ST " + TEMP_REG + ", 0("+ STACK_PTR_REG + ")   Store return address");
+        writer.println(currentLine + ": ST " + TEMP_REG + ", 0("+ TABLE_STACK_REG + ")   Store return address");
         currentLine++;
         /*Move stack pointer by 1 to allocate*/
-        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ", 1("+ STACK_PTR_REG + ")   Increment stack ");
+        writer.println(currentLine + ": LDA " + TABLE_STACK_REG + ", 1("+ TABLE_STACK_REG + ")   Increment stack ");
         currentLine++;
 
         /*Put a the old frame pointer in memory*/
-        writer.println(currentLine + ": ST " + FRAME_PTR_REG + ", 0("+ STACK_PTR_REG + ")   Store frame pointer ");
+        writer.println(currentLine + ": ST " + FRAME_PTR_REG + ", 0("+ TABLE_STACK_REG + ")   Store frame pointer ");
         currentLine++;
         /*Move stack pointer by 1 to allocate*/
-        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ", 1("+ STACK_PTR_REG + ")   Increment stack ");
+        writer.println(currentLine + ": LDA " + TABLE_STACK_REG + ", 1("+ TABLE_STACK_REG + ")   Increment stack ");
         currentLine++;
 
         /*Put a the old variable table pointer in memory*/
-        writer.println(currentLine + ": ST " + TABLE_STACK_REG + ", 0("+ STACK_PTR_REG + ")   Store table pointer ");
+        writer.println(currentLine + ": ST " + STACK_PTR_REG + ", 0("+ TABLE_STACK_REG + ")   Store table pointer ");
         currentLine++;
         /*Move stack pointer by 1 to allocate*/
-        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ", 1("+ STACK_PTR_REG + ")   Increment stack ");
+        writer.println(currentLine + ": LDA " + TABLE_STACK_REG + ", 1("+ TABLE_STACK_REG + ")   Increment stack ");
         currentLine++;
 
         /*New frame pointer*/
-        writer.println(currentLine + ": LDA " + FRAME_PTR_REG + ", 0("+ STACK_PTR_REG + ")   Set new frame pointer ");
+        writer.println(currentLine + ": LDA " + FRAME_PTR_REG + ", 0("+ TABLE_STACK_REG + ")   Set new frame pointer ");
         currentLine++;
 
         /*New PC*/
@@ -122,6 +122,13 @@ abstract public class CodeGen {
         writer.println(currentLine + ": LDA " + STACK_PTR_REG + ",  -1(" + STACK_PTR_REG + ")    Stack dealloc");
         currentLine++;
         writer.println(currentLine + ": LD  " + OPERAND1_REG + ", " + "0(" + STACK_PTR_REG + ")   Get value into operand");
+        currentLine++;
+    }
+
+    public static void genStackResultPush(){
+        writer.println(currentLine + ": ST " + RESULT_REG + ", 0(" + STACK_PTR_REG + ")    Store argument");
+        currentLine++;
+        writer.println(currentLine + ": LDA " + STACK_PTR_REG + ", 1(" + STACK_PTR_REG + ")    Store argument");
         currentLine++;
     }
 

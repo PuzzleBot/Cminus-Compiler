@@ -1,16 +1,6 @@
-/*Test 3: Operand matching*/
-
 void main (void) {
     int x;
-    void y;
-
     x = 5;
 
-    x = x + 5;
-    x = y + 5;  /*Cannot use void with int*/
-    y = x + 5;  /*Cannot assign int to void*/
-
-    if(x == y){
-    	/*Cannot use y in comparison*/
-    }
+    return;
 }
