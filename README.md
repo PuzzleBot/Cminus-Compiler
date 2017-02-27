@@ -1,3 +1,9 @@
+Authors: Brandon Tan, George Chapman-Brown
+Created for the 4th year compilers course at the University of Guelph.
+(Note - An almost exact copy of the repository also exists on George's github)
+
+---------------------------------------------------------------------------------------------
+
 A JFlex+Cup implementation for the C-Minus language.
 
   To build the entire program, type "make" in the current directory, which will 
