@@ -1,5 +1,7 @@
 Authors: Brandon Tan, George Chapman-Brown
+
 Created for the 4th year compilers course at the University of Guelph.
+
 (Note - An almost exact copy of the repository also exists on George's github)
 
 ---------------------------------------------------------------------------------------------
